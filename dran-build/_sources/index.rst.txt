@@ -1,0 +1,99 @@
+.. dran documentation master file, created by
+   sphinx-quickstart on Thu Aug 10 13:15:59 2023.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
+
+Welcome to dran's documentation!
+================================
+
+Introduction
+------------
+
+**DRAN** is a data reduction and analysis software program developed to systematically reduce and analyze 
+`HartRAO's <http://www.hartrao.ac.za/>`_ drift scan data collected 
+by `HartRAO's 26m telescope <http://www.hartrao.ac.za/hh26m_factsfile.html>`_. 
+The software is a newly developed program intended to replace the old LINES program previously used at HartRAO. 
+
+The package was built on Python 3.8 and provides
+a set of tools to perform common analysis tasks that 
+include but are not limited to,
+
+- Data extraction and preperation,
+- Data modeling and fitting, as well as 
+- Data visualization 
+
+.. caution:: 
+   This project is under active development 
+
+How does it work ?
+------------------
+
+DRAN uses a simple workflow which can be summarised as follows.
+When a file is read-in, the program creates a dictionary where 
+all the extracted and calculated source parmeters are stored. 
+
+It then proceeds to 
+
+    * cleans or filter out any :doc:`extras/rfi` present in the data  
+    * correct or remove any drift that may be present in the data due to telescope effects, and 
+    * tries to fit the peak of the signal ( i.e. upper 20 - 50% of the beam) depending on how good the signal is after cleansing. 
+
+The result and other statistics are then written 
+into a database where they can then be analysed using various statistical tools.
+All accompanying plots are stored in the plots folder created in the users current working directory. 
+
+.. note:: 
+   Although data is primnarily stored in an SQLite database, it can also easily be converted into 
+   a csv file. 
+
+The main mode of data processing in DRAN is through the :doc:`extras/cli`. This interface is best suited for 
+automated or semi-automated analysis. For a more hands on approach a 
+:doc:`extras/gui` is also provided 
+and is best suited for handling single file inspection, fitting and timeseries analysis. 
+
+What's next
+------------
+
+To get a better grasp of how the program works a set of :doc:`extras/tuts/tutorials` have been provided. 
+For instructions on how to install DRAN 
+see the :doc:`extras/installation` page. To jump right in, 
+a short :doc:`extras/quickstart` guide is also provided.
+Also please read through the :doc:`extras/caveats` to keep updated 
+on the program limitations and assumptions made before beginning any analysis.
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+   extras/installation.rst
+
+   extras/caveats.rst
+
+   extras/quickstart.rst
+
+   extras/cli.rst
+
+   extras/gui.rst
+
+   extras/rfi.rst
+
+   changelog.rst
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Tutorials:
+
+   extras/tuts/tutorials.rst
+
+   extras/commands.rst
+   
+
+..   docs/modules.rst
+
+
+.. Indices and tables
+.. ==================
+
+.. * :ref:`genindex`
+.. * :ref:`modindex`
+.. * :ref:`search`

@@ -1,0 +1,861 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>src.common.plot_manager &#8212; dran v1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/nature.css" />
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/sphinx_highlight.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">dran v1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">src.common.plot_manager</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for src.common.plot_manager</h1><div class="highlight"><pre>
+<span></span><span class="c1"># ============================================================================#</span>
+<span class="c1"># File: plot_manager.py                                                       #</span>
+<span class="c1"># Author: Pfesesani V. van Zyl                                                #</span>
+<span class="c1"># ============================================================================#</span>
+
+<span class="c1"># Standard library imports</span>
+<span class="c1"># --------------------------------------------------------------------------- #</span>
+<span class="kn">from</span> <span class="nn">common.fitting</span> <span class="kn">import</span> <span class="n">locate_baseline_blocks_auto</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">pl</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">interpolate</span>
+
+
+
+<span class="c1"># Local imports</span>
+<span class="c1"># --------------------------------------------------------------------------- #</span>
+<span class="kn">from</span> <span class="nn">common.messaging</span> <span class="kn">import</span> <span class="n">msg_wrapper</span>
+<span class="kn">import</span> <span class="nn">common.exceptions</span> <span class="k">as</span> <span class="nn">ex</span>
+<span class="kn">from</span> <span class="nn">common.fitting</span> <span class="kn">import</span> <span class="n">check_for_nans</span><span class="p">,</span> <span class="n">clean_rfi</span><span class="p">,</span> <span class="n">fit_beam</span><span class="p">,</span> <span class="n">sig_to_noise</span><span class="p">,</span> <span class="n">fit_dual_beam</span>
+<span class="c1"># =========================================================================== #</span>
+
+
+<div class="viewcode-block" id="PlotManager"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.plot_manager.PlotManager">[docs]</a><span class="k">class</span> <span class="nc">PlotManager</span><span class="p">:</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plot manager. Manages the plotting process of the drift scan.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            log (object): Logging object</span>
+<span class="sd">            data (dict): dictionary of source parameters</span>
+<span class="sd">            scanNum (int): Value representing the current scan</span>
+<span class="sd">            scanNames (str): The names of the drift scans</span>
+<span class="sd">            xData (array): x data of current scan</span>
+<span class="sd">            yData (array): y data of current scan</span>
+<span class="sd">            force (str): Force drift scan fitting yes or no</span>
+<span class="sd">            keep (str): Keep original plots of the drift scan yes or no</span>
+<span class="sd">            saveLocs (None): Save x-axis locations where fitting was done</span>
+<span class="sd">            fitTheoretical (None): Fit drift scan at theoretical location, i.e. at fnbw </span>
+<span class="sd">            applyRFIremoval (None): Apply RFI removal to the data </span>
+<span class="sd">            autoFit (None): Fit drift scan at locations selected by the code.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">scanNum</span><span class="p">,</span> <span class="n">scanNames</span><span class="p">,</span> <span class="n">xData</span><span class="p">,</span> <span class="n">yData</span><span class="p">,</span> <span class="n">log</span><span class="p">,</span><span class="n">force</span><span class="o">=</span><span class="s2">&quot;n&quot;</span><span class="p">,</span><span class="n">keep</span><span class="o">=</span><span class="s2">&quot;n&quot;</span><span class="p">,</span><span class="n">saveLocs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">fitTheoretical</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">applyRFIremoval</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">autoFit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">scanSaveFolder</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+  
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span> <span class="o">=</span> <span class="n">log</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scanNum</span> <span class="o">=</span> <span class="n">scanNum</span>              
+        <span class="bp">self</span><span class="o">.</span><span class="n">noTotScans</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">scanNames</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rawX</span> <span class="o">=</span> <span class="n">xData</span>                   
+        <span class="bp">self</span><span class="o">.</span><span class="n">rawY</span> <span class="o">=</span> <span class="n">yData</span>         
+        <span class="bp">self</span><span class="o">.</span><span class="n">force</span> <span class="o">=</span> <span class="n">force</span>        
+        <span class="bp">self</span><span class="o">.</span><span class="n">keep</span> <span class="o">=</span> <span class="n">keep</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">saveLocs</span><span class="o">=</span><span class="n">saveLocs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fitTheoretical</span><span class="o">=</span><span class="n">fitTheoretical</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">applyRFIremoval</span><span class="o">=</span><span class="n">applyRFIremoval</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">autoFit</span><span class="o">=</span><span class="n">autoFit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scanSaveFolder</span><span class="o">=</span><span class="n">scanSaveFolder</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">scanNames</span> <span class="o">=</span> <span class="n">scanNames</span>            <span class="c1"># Names of the drift scans</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">flag</span> <span class="o">=</span> <span class="mi">0</span>                         <span class="c1"># Default Flag = 0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;FILENAME&#39;</span><span class="p">][:</span><span class="mi">18</span><span class="p">]</span>     <span class="c1"># Filename of current scan</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">beamType</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;BEAMTYPE&#39;</span><span class="p">]</span>      <span class="c1"># Beam type of current scan</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hduLength</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;HDULENGTH&quot;</span><span class="p">]</span>    <span class="c1"># Length of HDU</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">FNBW</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;FNBW&#39;</span><span class="p">]</span>              <span class="c1"># First null beam width</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">HPBW</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;HPBW&#39;</span><span class="p">]</span>              <span class="c1"># Half power beam width</span>
+
+        <span class="c1"># Create a tag for the current scan under evaluation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_tag</span><span class="p">()</span>
+
+<div class="viewcode-block" id="PlotManager.create_tag"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.plot_manager.PlotManager.create_tag">[docs]</a>    <span class="k">def</span> <span class="nf">create_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Create a tag for the plots according to the current scan being processed.</span>
+<span class="sd">            e.g. ON_RCP</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span><span class="s2">&quot;Set up name tags&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;HDULENGTH&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">7</span><span class="p">:</span>
+            <span class="n">tag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_set_file_tag_nb</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">tag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_set_file_tag_wb</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">tag</span></div>
+
+    <span class="k">def</span> <span class="nf">_set_file_tag_wb</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Set the name tag for wide beam data/plots. &quot;&quot;&quot;</span>
+
+        <span class="n">tagId</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scanNum</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">tagId</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;info&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">,</span><span class="s2">&quot;Processing: ON_LCP&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="s2">&quot;ON_LCP&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;info&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">,</span><span class="s2">&quot;Processing: ON_RCP&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="s2">&quot;ON_RCP&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_set_file_tag_nb</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Set the name tag for narrow beam data/plots.&quot;&quot;&quot;</span>
+
+        <span class="n">tagId</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scanNum</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">tagId</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;info&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">,</span><span class="s2">&quot;Processing: HPS_LCP&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="s2">&quot;HPS_LCP&quot;</span>
+
+        <span class="k">elif</span> <span class="n">tagId</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;info&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">,</span><span class="s2">&quot;Processing: HPN_LCP&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="s2">&quot;HPN_LCP&quot;</span>
+
+        <span class="k">elif</span> <span class="n">tagId</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;info&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">,</span><span class="s2">&quot;Processing: ON_LCP&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="s2">&quot;ON_LCP&quot;</span>
+
+        <span class="k">elif</span> <span class="n">tagId</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;info&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">,</span><span class="s2">&quot;Processing: HPS_RCP&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="s2">&quot;HPS_RCP&quot;</span>
+
+        <span class="k">elif</span> <span class="n">tagId</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;info&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">,</span><span class="s2">&quot;Processing: HPN_RCP&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="s2">&quot;HPN_RCP&quot;</span>
+
+        <span class="k">elif</span> <span class="n">tagId</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
+            <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;info&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">,</span><span class="s2">&quot;Processing: ON_RCP&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="s2">&quot;ON_RCP&quot;</span>
+
+    <span class="c1">#@profile</span>
+<div class="viewcode-block" id="PlotManager.process_plot"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.plot_manager.PlotManager.process_plot">[docs]</a>    <span class="k">def</span> <span class="nf">process_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Process data plotting. &quot;&quot;&quot;</span>
+
+        <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span> <span class="s2">&quot;Begin data cleansing&quot;</span><span class="p">)</span>
+        <span class="n">saveFolder</span> <span class="o">=</span> <span class="s2">&quot;currentScanPlots/&quot;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;FILENAME&quot;</span><span class="p">][:</span><span class="mi">18</span><span class="p">]</span><span class="o">+</span><span class="s2">&quot;_&quot;</span>
+
+        <span class="c1"># 1. Validate the data contains observations</span>
+        <span class="c1"># Data with nan values are immediately discarded or ignored.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rawY</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">flag</span> <span class="o">=</span> <span class="n">check_for_nans</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rawY</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">flag</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;warning&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">,</span> <span class="s2">&quot;Flag 1: Found nans&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_fit_params_to_zero</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">plot_no_fit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rawX</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rawY</span><span class="p">,</span> <span class="s2">&quot;Flag 1: Found nans&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># 2. Clean the data, remove RFI</span>
+            <span class="c1"># RFI can make fitting a drift scan imossible, this is why as </span>
+            <span class="c1"># part of the cleaning process we eliminate or remove any data</span>
+            <span class="c1"># that is an outlier, surpassing all other data points by more than</span>
+            <span class="c1"># 3 times the rms.</span>
+
+            <span class="c1">#print(self.applyRFIremoval)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">applyRFIremoval</span><span class="o">==</span><span class="s2">&quot;n&quot;</span><span class="p">:</span>
+                <span class="n">xCleanedRFI</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rawX</span>
+                <span class="n">yCleanedRFI</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rawY</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">rmsBeforeClean</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span> 
+                <span class="bp">self</span><span class="o">.</span><span class="n">rmsAfterClean</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span> 
+                <span class="n">spl</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span> 
+                <span class="n">pt</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">xCleanedRFI</span><span class="p">,</span> <span class="n">yCleanedRFI</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rmsBeforeClean</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rmsAfterClean</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="n">pt</span> <span class="o">=</span> <span class="n">clean_rfi</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">rawX</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rawY</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">)</span>
+
+            <span class="c1"># make plots of the current scan for source overview</span>
+            <span class="c1"># ----------------------------------------------------------------------</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">plot_beam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rawX</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rawY</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scanNames</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">scanNames</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">scanNum</span><span class="o">+</span><span class="mi">2</span><span class="p">],</span>
+                                <span class="s2">&quot;Raw data&quot;</span><span class="p">,</span> <span class="n">saveFolder</span><span class="o">+</span><span class="s2">&quot;raw_data.png&quot;</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="s2">&quot;C0&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">plot_beam</span><span class="p">(</span><span class="n">xCleanedRFI</span><span class="p">,</span> <span class="n">yCleanedRFI</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scanNames</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">scanNames</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">scanNum</span><span class="o">+</span><span class="mi">2</span><span class="p">],</span>
+                            <span class="s2">&quot;Cleaned data&quot;</span><span class="p">,</span> <span class="n">saveFolder</span><span class="o">+</span><span class="s2">&quot;cleaned_data.png&quot;</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="s2">&quot;C1&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">overplot_raw_data</span><span class="p">(</span><span class="n">xCleanedRFI</span><span class="p">,</span> <span class="n">yCleanedRFI</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scanNames</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">scanNames</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">scanNum</span><span class="o">+</span><span class="mi">2</span><span class="p">],</span> <span class="s2">&quot;clean data&quot;</span><span class="p">,</span> <span class="s2">&quot;currentScanPlots/overlay_data.png&quot;</span><span class="p">,</span> <span class="s2">&quot;C1&quot;</span><span class="p">)</span>
+            <span class="c1"># ----------------------------------------------------------------------</span>
+
+            <span class="c1">#sys.exit()</span>
+            <span class="c1"># if the data gets too cleaned, i.e. 1/2 or more of the peak is lost, keep the raw data</span>
+            <span class="n">cleanedPeakRatio</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">yCleanedRFI</span><span class="p">)</span><span class="o">/</span><span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rawY</span><span class="p">)</span> <span class="c1"># ratio of peak cleaned / raw peak</span>
+            <span class="n">rmsRatio</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rmsBeforeClean</span><span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">rmsAfterClean</span>
+            <span class="c1">#print(f&#39;max raw: {max(self.rawY):.3f}, max cleaned: {max(yCleanedRFI):.3f}, ratio: {cleanedPeakRatio:.3f}&#39;)</span>
+            <span class="c1">#print(f&#39;rmsb: {self.rmsBeforeClean:.3f}, rmsa: {self.rmsAfterClean:.3f},  ratio: {rmsRatio:.3f}, diff: {self.rmsBeforeClean-self.rmsAfterClean:.3f}&#39;)</span>
+
+            <span class="c1"># if cleanedPeakRatio &lt;0.9:</span>
+            <span class="c1">#     xCleanedRFI=self.rawX</span>
+            <span class="c1">#     yCleanedRFI=self.rawY</span>
+            <span class="c1">#     print(self.rmsBeforeClean, self.rmsAfterClean)</span>
+            <span class="c1">#     #sys.exit()</span>
+
+            <span class="c1"># pl.plot(self.rawX, self.rawY, label=self.scanNames[0])</span>
+            <span class="c1"># pl.plot(xCleanedRFI, yCleanedRFI)</span>
+            <span class="c1"># pl.show()</span>
+            <span class="c1"># pl.close()</span>
+            <span class="c1"># sys.exit()</span>
+
+            <span class="c1"># 3. Check rms for error handling of bad data</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rmsAfterClean</span> <span class="o">&gt;=</span> <span class="mf">1.0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">flag</span> <span class="o">=</span> <span class="mi">2</span>
+                <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;warning&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">,</span> <span class="s2">&quot;RMS &gt;= 1.0&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">set_fit_params_to_zero</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">plot_no_fit</span><span class="p">(</span><span class="n">xCleanedRFI</span><span class="p">,</span> <span class="n">yCleanedRFI</span><span class="p">,</span> 
+                <span class="s2">&quot;Flag &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flag</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;: High rms &gt; 1&quot;</span><span class="p">)</span><span class="c1">#,self.scanNames[0])#, self.scanNames[self.scanNum+2],</span>
+                <span class="c1"># &quot;Plot of drift scan &quot;+self.data[&quot;FILENAME&quot;][:18])</span>
+            <span class="k">else</span><span class="p">:</span>
+
+                <span class="c1"># 4. Correct baseline and Create a new data set with no drift</span>
+                <span class="c1">#sys.exit()</span>
+                <span class="c1"># For dual beam data</span>
+                <span class="k">if</span> <span class="s2">&quot;D&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">beamType</span><span class="p">:</span>
+                    <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;info&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">,</span><span class="s2">&quot;Dual beam processing&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;BEAMTYPE&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;06.0D&quot;</span><span class="p">:</span>
+                        <span class="n">npts</span> <span class="o">=</span> <span class="mi">150</span> <span class="c1"># number of pts for baseline fit</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;OBJECTTYPE&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;CAL&quot;</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">factor</span> <span class="o">=</span> <span class="mf">.55</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">factor</span> <span class="o">=</span> <span class="mf">.8</span>  <span class="c1"># .65</span>
+
+                    <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;BEAMTYPE&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;03.5D&quot;</span><span class="p">:</span>
+                        <span class="n">npts</span> <span class="o">=</span> <span class="mi">100</span>  <span class="c1"># number of pts for baseline fit</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;OBJECTTYPE&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;CAL&quot;</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">factor</span> <span class="o">=</span> <span class="mf">.6</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">factor</span> <span class="o">=</span> <span class="mf">.65</span>
+
+                    <span class="c1"># fit the data</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">yCorrected</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">driftRes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">driftRms</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">driftSlope</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseLocs</span><span class="p">,</span>\
+                    <span class="bp">self</span><span class="o">.</span><span class="n">xPeakDataAbeam</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">yPeakDataAbeam</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">yMaxAbeam</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">erryMaxAbeam</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resAbeam</span><span class="p">,</span>\
+                    <span class="bp">self</span><span class="o">.</span><span class="n">xPeakDataBbeam</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">yPeakDataBbeam</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">yMinBbeam</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">erryMinBbeam</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resBbeam</span><span class="p">,</span>\
+                        <span class="n">msg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">flag</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">peakLoca</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">peakLocb</span> <span class="o">=</span> <span class="n">fit_dual_beam</span><span class="p">(</span>
+                        <span class="n">xCleanedRFI</span><span class="p">,</span> <span class="n">yCleanedRFI</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">HPBW</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">FNBW</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">factor</span><span class="p">,</span> <span class="n">npts</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;LATITUDE&quot;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;OBJECTTYPE&quot;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scanNum</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">force</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">)</span>
+
+                    
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">yCorrected</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+              
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">erryMaxAbeam</span> <span class="o">&gt;</span> <span class="mf">1.</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">erryMinBbeam</span> <span class="o">&gt;</span> <span class="mf">1.</span><span class="p">:</span>
+                            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Peak rms &gt; 1&quot;</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">flag</span> <span class="o">=</span> <span class="mi">13</span>
+                            <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;warning&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">set_fit_params_to_zero</span><span class="p">()</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">plot_no_fit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rawX</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rawY</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+
+                        <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">erryMaxAbeam</span><span class="p">)</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">erryMinBbeam</span><span class="p">):</span>
+                            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;RMS is +- inf&quot;</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">flag</span> <span class="o">=</span> <span class="mi">14</span>
+                            <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;warning&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">set_fit_params_to_zero</span><span class="p">()</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">plot_no_fit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rawX</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rawY</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="c1"># Estimate the signal to noise ratio</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">s2na</span> <span class="o">=</span> <span class="n">sig_to_noise</span><span class="p">(</span>
+                                        <span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">yMaxAbeam</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">driftRes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">s2nb</span> <span class="o">=</span> <span class="n">sig_to_noise</span><span class="p">(</span>
+                                        <span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">yMinBbeam</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">driftRes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">)</span>
+                            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;S/N A beam: </span><span class="si">{:.2f}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">S/N B beam: </span><span class="si">{:.2f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">s2na</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">s2nb</span><span class="p">))</span>
+
+                            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">s2na</span> <span class="o">&lt;</span> <span class="mf">3.</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">s2nb</span> <span class="o">&lt;</span> <span class="mf">3.</span><span class="p">:</span>
+                                <span class="n">msg</span><span class="o">=</span><span class="s2">&quot;Got a s2n &lt; 3&quot;</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">flag</span> <span class="o">=</span> <span class="mi">15</span>
+                                <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;warning&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="k">pass</span>
+
+                            <span class="n">scanLen</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">xCleanedRFI</span><span class="p">)</span>
+                            <span class="n">ptLimit</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">scanLen</span><span class="o">*</span><span class="mf">0.04</span><span class="p">)</span> <span class="c1"># Point limit, number of allowed points per base block</span>
+                            <span class="n">lb</span>  <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">ptLimit</span><span class="p">]</span>
+                            <span class="n">rb</span> <span class="o">=</span> <span class="p">[</span><span class="n">scanLen</span><span class="o">-</span><span class="n">ptLimit</span><span class="p">,</span><span class="n">scanLen</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                            
+                            <span class="n">lbl</span><span class="o">=</span><span class="p">[]</span>
+                            <span class="n">rbl</span><span class="o">=</span><span class="p">[]</span>
+                            <span class="p">[</span><span class="n">lbl</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">xCleanedRFI</span><span class="p">[</span><span class="n">xx</span><span class="p">]</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">))</span> <span class="k">for</span> <span class="n">xx</span> <span class="ow">in</span> <span class="n">lb</span><span class="p">]</span>
+                            <span class="p">[</span><span class="n">rbl</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">xCleanedRFI</span><span class="p">[</span><span class="n">xx</span><span class="p">]</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">))</span> <span class="k">for</span> <span class="n">xx</span> <span class="ow">in</span> <span class="n">rb</span><span class="p">]</span>
+
+                            <span class="n">datadict</span><span class="o">=</span><span class="p">{}</span>
+                            <span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;FILENAME&#39;</span><span class="p">][:</span><span class="mi">18</span><span class="p">]</span>
+                            <span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;scan&#39;</span><span class="p">]</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tag</span>
+                            <span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;leftBaselinePts&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">lbl</span>
+                            <span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;rightBaselinePts&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">rbl</span>
+                            <span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;baselineRms&#39;</span><span class="p">]</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">driftRms</span>
+                            
+                            <span class="c1"># potential for buggy behavior</span>
+                            <span class="k">try</span><span class="p">:</span>
+                                <span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;baselineSlope&#39;</span><span class="p">]</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">driftSlope</span>
+                                <span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;baselineIntercept&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="c1">#self.driftCoeffs[1]</span>
+                                <span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;peakPtsA&#39;</span><span class="p">]</span><span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">xPeakDataAbeam</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">xPeakDataAbeam</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)]</span>
+                                <span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;peakPtsB&#39;</span><span class="p">]</span><span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">xPeakDataBbeam</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">xPeakDataBbeam</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)]</span>
+                            <span class="k">except</span><span class="p">:</span>
+                                <span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;baselineSlope&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span> 
+                                <span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;baselineIntercept&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>      
+                                <span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;peakPtsA&#39;</span><span class="p">]</span><span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>        
+                                <span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;peakPtsB&#39;</span><span class="p">]</span><span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>            
+                            
+                            <span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;yMaxA&#39;</span><span class="p">]</span><span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">yMaxAbeam</span>
+                            <span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;yMaxErrA&#39;</span><span class="p">]</span><span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">erryMaxAbeam</span>
+                            <span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;yMinB&#39;</span><span class="p">]</span><span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">yMinBbeam</span>
+                            <span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;yMinErrB&#39;</span><span class="p">]</span><span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">erryMinBbeam</span>
+                            
+                            <span class="c1">#print(&quot;\nRaw Data &quot;)</span>
+                            <span class="c1">#print(self.autoFit)</span>
+                            <span class="c1">#print(&quot;\nProcessed Data &quot;)</span>
+                            <span class="c1">#print(datadict,&quot;\n&quot;)</span>
+
+                            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">saveLocs</span><span class="o">==</span><span class="s2">&quot;y&quot;</span><span class="p">:</span>
+                                <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span><span class="s2">&quot;Saving theoretical locs&quot;</span><span class="p">)</span>
+                                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;plot_locs.txt&#39;</span><span class="p">,</span><span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fl</span><span class="p">:</span>
+                                    <span class="n">fl</span><span class="o">.</span><span class="n">write</span><span class="p">((</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">;</span><span class="si">{}</span><span class="s1">;</span><span class="si">{}</span><span class="s1">;</span><span class="si">{}</span><span class="s1">;</span><span class="si">{:.3f}</span><span class="s1">;</span><span class="si">{:.3f}</span><span class="s1">;</span><span class="si">{:.3f}</span><span class="s1">;</span><span class="si">{}</span><span class="s1">;</span><span class="si">{:.3f}</span><span class="s1">;</span><span class="si">{:.3f}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                                        <span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;scan&#39;</span><span class="p">],</span> <span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;leftBaselinePts&#39;</span><span class="p">],</span><span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;rightBaselinePts&#39;</span><span class="p">],</span> 
+                                        <span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;baselineSlope&#39;</span><span class="p">],</span> <span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;baselineIntercept&#39;</span><span class="p">],</span> <span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;baselineRms&#39;</span><span class="p">],</span>
+                                        <span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;peakPtsA&#39;</span><span class="p">],</span><span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;yMaxA&#39;</span><span class="p">]</span> <span class="p">,</span><span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;yMaxErrA&#39;</span><span class="p">],</span>
+                                        <span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;peakPtsB&#39;</span><span class="p">],</span><span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;yMaxB&#39;</span><span class="p">]</span> <span class="p">,</span><span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;yMaxErrB&#39;</span><span class="p">]))</span>
+                            
+                            <span class="k">elif</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">saveLocs</span><span class="o">!=</span><span class="s2">&quot;y&quot;</span><span class="p">):</span>
+                                <span class="k">pass</span>
+
+                            <span class="c1"># If all is good, plot basic</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">plot_basic_db</span><span class="p">(</span>
+                                        <span class="n">xCleanedRFI</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">yCorrected</span><span class="p">)</span>
+
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">msg</span><span class="o">=</span><span class="s2">&quot;No data&quot;</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">flag</span> <span class="o">=</span> <span class="mi">1</span>
+                        <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;warning&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">set_fit_params_to_zero</span><span class="p">()</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">plot_no_fit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rawX</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rawY</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+
+                <span class="c1"># for single beam data</span>
+                <span class="k">if</span> <span class="s2">&quot;S&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">beamType</span><span class="p">:</span>
+                    
+                    <span class="c1"># set initial parameters for data fitting</span>
+                    <span class="n">p0</span> <span class="o">=</span> <span class="p">[</span><span class="nb">max</span><span class="p">(</span><span class="n">yCleanedRFI</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">xCleanedRFI</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">HPBW</span><span class="p">,</span> <span class="mf">.01</span><span class="p">,</span> <span class="mf">.0</span><span class="p">]</span>
+
+                    <span class="bp">self</span><span class="o">.</span><span class="n">peakFit</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">peakModel</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">peakRms</span><span class="p">,</span> <span class="n">yCorrected</span><span class="p">,</span> <span class="n">peakPts</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">driftRes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">driftRms</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">driftCoeffs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fitRes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">flag</span><span class="p">,</span>  <span class="bp">self</span><span class="o">.</span><span class="n">baseLeft</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseRight</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">base</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">peakLoc</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">lb</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">rb</span> <span class="o">=</span> <span class="n">fit_beam</span><span class="p">(</span>
+                        <span class="n">xCleanedRFI</span><span class="p">,</span> <span class="n">yCleanedRFI</span><span class="p">,</span> <span class="n">p0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">FNBW</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;LATITUDE&quot;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scanNum</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">force</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fitTheoretical</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">autoFit</span><span class="p">)</span>
+
+                    <span class="c1"># Check residuals make sense</span>
+                    <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">driftRes</span>
+
+                    <span class="c1"># expect gaussian noise, need to figure out how to treat outlier data</span>
+                    <span class="c1"># generate random gaussian noise and subtract it from residal result and </span>
+                    <span class="c1"># examine results.</span>
+
+                    <span class="c1">#print(data)</span>
+
+                    <span class="c1"># if len(data)==0:</span>
+                    <span class="c1">#     msg = &quot;\nPossible spike in Residuals &quot;</span>
+                    <span class="c1">#     msg_wrapper(&quot;warning&quot;, self.log.warning, msg)</span>
+                    <span class="c1">#     self.flag = 120</span>
+                    <span class="c1">#     self.set_fit_params_to_zero()</span>
+                    <span class="c1">#     #pl.hist(data)</span>
+                    <span class="c1">#     #pl.show()</span>
+                    <span class="c1">#     self.plot_no_fit(self.rawX, self.rawY, msg)</span>
+
+                    <span class="c1"># #print(min(data),max(data), abs(min(data)/max(data)), abs(max(data)/min(data)) )</span>
+                    <span class="c1"># elif abs(min(data)) &gt; ((abs(max(data))) + 0.8*abs(max(data))):</span>
+                    <span class="c1">#     msg = &quot;\nPossible spike in Residuals 1&quot;</span>
+                    <span class="c1">#     msg_wrapper(&quot;warning&quot;, self.log.warning, msg)</span>
+                    <span class="c1">#     self.flag = 121</span>
+                    <span class="c1">#     self.set_fit_params_to_zero()</span>
+                    <span class="c1">#     #pl.hist(data)</span>
+                    <span class="c1">#     #pl.show()</span>
+                    <span class="c1">#     self.plot_no_fit(self.rawX, self.rawY, msg)</span>
+
+                    <span class="c1"># elif abs(max(data)) &gt; ((abs(min(data))) + 0.8*abs(min(data))):</span>
+                    <span class="c1">#     msg = &quot;\nPossible spike in Residuals 2&quot;</span>
+                    <span class="c1">#     msg_wrapper(&quot;warning&quot;, self.log.warning, msg)</span>
+                    <span class="c1">#     self.flag = 122</span>
+                    <span class="c1">#     self.set_fit_params_to_zero()</span>
+                    <span class="c1">#     self.plot_no_fit(self.rawX, self.rawY, msg)</span>
+        
+                    <span class="c1"># Ensure we have a baseline corrected scan</span>
+                    <span class="c1">#el</span>
+
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">yCorrected</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+
+                        <span class="k">if</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">peakModel</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Max &lt; 0&quot;</span>
+                            <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;warning&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">flag</span> <span class="o">=</span> <span class="mi">12</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">set_fit_params_to_zero</span><span class="p">()</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">plot_no_fit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rawX</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rawY</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+
+                        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">peakRms</span> <span class="o">&gt;</span> <span class="mf">1.</span><span class="p">:</span>
+                            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Peak rms &gt; 1&quot;</span>
+                            <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;warning&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">flag</span> <span class="o">=</span> <span class="mi">13</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">set_fit_params_to_zero</span><span class="p">()</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">plot_no_fit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rawX</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rawY</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+
+                        <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">peakRms</span><span class="p">):</span>
+                            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">RMS is +- inf&quot;</span>
+                            <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;warning&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">flag</span> <span class="o">=</span> <span class="mi">14</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">set_fit_params_to_zero</span><span class="p">()</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">plot_no_fit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rawX</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rawY</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+                            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+
+                        <span class="k">else</span><span class="p">:</span>
+
+                            <span class="c1"># =============================================</span>
+                            <span class="c1"># Estimate the signal to noise ratio</span>
+                            <span class="c1"># =============================================</span>
+                            <span class="n">msg</span><span class="o">=</span><span class="s2">&quot;Peak = </span><span class="si">{:.3f}</span><span class="s2"> +- </span><span class="si">{:.3f}</span><span class="s2"> [K]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">peakFit</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">peakRms</span><span class="p">)</span>
+                            <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;info&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">s2n</span> <span class="o">=</span> <span class="n">sig_to_noise</span><span class="p">(</span>
+                                        <span class="nb">max</span><span class="p">(</span><span class="n">yCorrected</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">driftRes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">)</span>
+                            <span class="n">msg2</span><span class="o">=</span><span class="s2">&quot;S/N: </span><span class="si">{:.2f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">s2n</span><span class="p">)</span>
+                            <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;info&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">,</span> <span class="n">msg2</span><span class="p">)</span>
+
+                            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">s2n</span> <span class="o">&lt;</span> <span class="mf">3.0</span><span class="p">:</span>
+                                <span class="n">msg</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;signal to noise ratio &lt; 3&quot;</span><span class="p">)</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">flag</span> <span class="o">=</span> <span class="mi">15</span>
+                                <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;warning&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="k">pass</span>
+
+                            <span class="c1">#print(&quot;hey&quot;)</span>
+                            <span class="n">lbl</span><span class="o">=</span><span class="p">[]</span>
+                            <span class="n">rbl</span><span class="o">=</span><span class="p">[]</span>
+                            <span class="p">[</span><span class="n">lbl</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">xCleanedRFI</span><span class="p">[</span><span class="n">xx</span><span class="p">]</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">))</span> <span class="k">for</span> <span class="n">xx</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">lb</span><span class="p">]</span>
+                            <span class="p">[</span><span class="n">rbl</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">xCleanedRFI</span><span class="p">[</span><span class="n">xx</span><span class="p">]</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">))</span> <span class="k">for</span> <span class="n">xx</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">rb</span><span class="p">]</span>
+
+                            <span class="n">datadict</span><span class="o">=</span><span class="p">{}</span>
+                            <span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;FILENAME&#39;</span><span class="p">][:</span><span class="mi">18</span><span class="p">]</span>
+                            <span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;scan&#39;</span><span class="p">]</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tag</span>
+                            <span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;leftBaselinePts&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">lbl</span>
+                            <span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;rightBaselinePts&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">rbl</span>
+                            <span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;baselineRms&#39;</span><span class="p">]</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">driftRms</span>
+                            <span class="c1">#datadict[&#39;baselineSlope&#39;]=self.driftCoeffs[0]</span>
+                            <span class="c1">#print(datadict)</span>
+                            <span class="c1">#sys.exit()</span>
+                            
+                            <span class="k">try</span><span class="p">:</span>
+                                <span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;baselineSlope&#39;</span><span class="p">]</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">driftCoeffs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                                <span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;baselineIntercept&#39;</span><span class="p">]</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">driftCoeffs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                                <span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;peakPts&#39;</span><span class="p">]</span><span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">xCleanedRFI</span><span class="p">[</span><span class="n">peakPts</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">xCleanedRFI</span><span class="p">[</span><span class="n">peakPts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)]</span>
+                            <span class="k">except</span><span class="p">:</span>
+                                <span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;baselineSlope&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span> 
+                                <span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;baselineIntercept&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>      
+                                <span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;peakPts&#39;</span><span class="p">]</span><span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>                
+                            
+                            <span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;yMax&#39;</span><span class="p">]</span><span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">peakFit</span>
+                            <span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;yMaxErr&#39;</span><span class="p">]</span><span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">peakRms</span>
+                            
+                            <span class="c1">#print(&quot;\nRaw Data &quot;)</span>
+                            <span class="c1">#print(self.autoFit)</span>
+                            <span class="c1">#print(&quot;\nProcessed Data &quot;)</span>
+                            <span class="c1">#print(datadict,&quot;\n&quot;)</span>
+
+                            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">saveLocs</span><span class="o">==</span><span class="s2">&quot;y&quot;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">fitTheoretical</span><span class="o">!=</span><span class="s2">&quot;y&quot;</span><span class="p">:</span>
+                                <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span><span class="s2">&quot;Saving ffree fitting locs&quot;</span><span class="p">)</span>
+                                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;plot_locs.txt&#39;</span><span class="p">,</span><span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fl</span><span class="p">:</span>
+                                    <span class="n">fl</span><span class="o">.</span><span class="n">write</span><span class="p">((</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">;</span><span class="si">{}</span><span class="s1">;</span><span class="si">{}</span><span class="s1">;</span><span class="si">{}</span><span class="s1">;</span><span class="si">{:.3f}</span><span class="s1">;</span><span class="si">{:.3f}</span><span class="s1">;</span><span class="si">{:.3f}</span><span class="s1">;</span><span class="si">{}</span><span class="s1">;</span><span class="si">{:.3f}</span><span class="s1">;</span><span class="si">{:.3f}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                                        <span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;scan&#39;</span><span class="p">],</span> <span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;leftBaselinePts&#39;</span><span class="p">],</span><span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;rightBaselinePts&#39;</span><span class="p">],</span> 
+                                        <span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;baselineSlope&#39;</span><span class="p">],</span> <span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;baselineIntercept&#39;</span><span class="p">],</span> <span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;baselineRms&#39;</span><span class="p">],</span>
+                                        <span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;peakPts&#39;</span><span class="p">],</span><span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;yMax&#39;</span><span class="p">]</span> <span class="p">,</span><span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;yMaxErr&#39;</span><span class="p">]))</span>
+
+                            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">saveLocs</span><span class="o">==</span><span class="s2">&quot;y&quot;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">fitTheoretical</span><span class="o">==</span><span class="s2">&quot;y&quot;</span><span class="p">:</span>
+                                <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span><span class="s2">&quot;Saving theoretical locs&quot;</span><span class="p">)</span>
+                                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;plot_locs.txt&#39;</span><span class="p">,</span><span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fl</span><span class="p">:</span>
+                                    <span class="n">fl</span><span class="o">.</span><span class="n">write</span><span class="p">((</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">;</span><span class="si">{}</span><span class="s1">;</span><span class="si">{}</span><span class="s1">;</span><span class="si">{}</span><span class="s1">;</span><span class="si">{:.3f}</span><span class="s1">;</span><span class="si">{:.3f}</span><span class="s1">;</span><span class="si">{:.3f}</span><span class="s1">;</span><span class="si">{}</span><span class="s1">;</span><span class="si">{:.3f}</span><span class="s1">;</span><span class="si">{:.3f}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                                        <span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;scan&#39;</span><span class="p">],</span> <span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;leftBaselinePts&#39;</span><span class="p">],</span><span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;rightBaselinePts&#39;</span><span class="p">],</span> 
+                                        <span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;baselineSlope&#39;</span><span class="p">],</span> <span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;baselineIntercept&#39;</span><span class="p">],</span> <span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;baselineRms&#39;</span><span class="p">],</span>
+                                        <span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;peakPts&#39;</span><span class="p">],</span><span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;yMax&#39;</span><span class="p">]</span> <span class="p">,</span><span class="n">datadict</span><span class="p">[</span><span class="s1">&#39;yMaxErr&#39;</span><span class="p">]))</span>
+                            
+                            <span class="k">elif</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">saveLocs</span><span class="o">!=</span><span class="s2">&quot;y&quot;</span><span class="p">):</span>
+                                <span class="k">pass</span>
+                            
+                            <span class="c1"># Plot the corrected drift scan</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">plot_result</span><span class="p">(</span><span class="n">xCleanedRFI</span><span class="p">,</span> <span class="n">yCorrected</span><span class="p">,</span> <span class="n">peakPts</span><span class="p">)</span>
+                            
+
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="c1">#self.flag = 1</span>
+                        <span class="c1">#msg = &quot;Found nans&quot;</span>
+                        <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;warning&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">,</span>
+                                        <span class="n">msg</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">set_fit_params_to_zero</span><span class="p">()</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">plot_no_fit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rawX</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rawY</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+
+        <span class="n">pl</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span></div>
+            
+            
+<div class="viewcode-block" id="PlotManager.set_fit_params_to_zero"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.plot_manager.PlotManager.set_fit_params_to_zero">[docs]</a>    <span class="k">def</span> <span class="nf">set_fit_params_to_zero</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Set fit parameters to zero/nan. &quot;&quot;&quot;</span>
+
+        <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span>
+                    <span class="s2">&quot;Setting data to zero for encountered error&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s2">&quot;D&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;BEAMTYPE&quot;</span><span class="p">]:</span>
+            <span class="c1"># for dual beam data</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">yMaxAbeam</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">erryMaxAbeam</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">s2na</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">yMinBbeam</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">erryMinBbeam</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">s2nb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rmsBeforeClean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rmsAfterClean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">driftRms</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">peakLoca</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">peakLocb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">driftSlope</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># for single beam data</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">peakFit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">peakRms</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">s2n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rmsBeforeClean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rmsAfterClean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">driftRms</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">driftSlope</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">peakLoc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span></div>
+
+<div class="viewcode-block" id="PlotManager.plot_no_fit"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.plot_manager.PlotManager.plot_no_fit">[docs]</a>    <span class="k">def</span> <span class="nf">plot_no_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="p">[],</span> <span class="n">y</span><span class="o">=</span><span class="p">[],</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">xlabel</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>  <span class="n">title</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plot corrupted data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">PLOT_PATH</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_plot_path</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">title</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="n">plotTitle</span> <span class="o">=</span> <span class="s2">&quot;Plot &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">[:</span><span class="mi">18</span><span class="p">]</span> <span class="o">+</span> \
+                <span class="s2">&quot; of &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;SOURCEDIR&quot;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">plotTitle</span> <span class="o">=</span> <span class="n">title</span>
+
+        <span class="n">pl</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">plotTitle</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">xlabel</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="n">pl</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Scandist [deg]&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">pl</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="n">xlabel</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">ylabel</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="n">pl</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Ta [K]&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">pl</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="n">ylabel</span><span class="p">)</span>
+
+        <span class="n">pl</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
+        <span class="n">pl</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;best&quot;</span><span class="p">)</span>
+        <span class="n">pl</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">PLOT_PATH</span><span class="p">)</span>
+        <span class="n">pl</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s1">&#39;all&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PlotManager.set_plot_path"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.plot_manager.PlotManager.set_plot_path">[docs]</a>    <span class="k">def</span> <span class="nf">set_plot_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s2">&quot;.png&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Set path where plot will be saved. &quot;&quot;&quot;</span>
+
+        <span class="n">plotPath</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">scanSaveFolder</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="o">+</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
+        
+        <span class="c1"># print(plotPath)</span>
+        <span class="c1"># print(self.scanSaveFolder)</span>
+        <span class="c1"># sys.exit()</span>
+
+        <span class="k">return</span> <span class="n">plotPath</span></div>
+
+<div class="viewcode-block" id="PlotManager.plot_beam"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.plot_manager.PlotManager.plot_beam">[docs]</a>    <span class="k">def</span> <span class="nf">plot_beam</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">xlab</span><span class="p">,</span> <span class="n">ylab</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span>  <span class="n">saveas</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span><span class="n">col</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; make a plot of the beam&quot;&quot;&quot;</span>
+
+
+        <span class="n">pl</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+        <span class="c1"># pl.xlabel(xlab+&quot; [Deg]&quot;)</span>
+        <span class="c1"># pl.ylabel(ylab+&quot; antenna temp [K]&quot;)</span>
+        <span class="n">pl</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Offset [Deg]&quot;</span><span class="p">)</span>
+        <span class="n">pl</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Ta [K]&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">col</span> <span class="o">==</span> <span class="s2">&quot;k&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">label</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                <span class="n">pl</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">pl</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">title</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">label</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                <span class="n">pl</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">pl</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">title</span><span class="p">)</span>
+        
+        <span class="n">pl</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;best&quot;</span><span class="p">)</span>
+        <span class="n">pl</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">saveas</span><span class="p">)</span>
+        <span class="n">pl</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s1">&#39;all&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PlotManager.plot_raw_beam"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.plot_manager.PlotManager.plot_raw_beam">[docs]</a>    <span class="k">def</span> <span class="nf">plot_raw_beam</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">saveas</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; make a plot of the raw beam&quot;&quot;&quot;</span>
+
+        <span class="n">pl</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+        <span class="n">pl</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Offset [Deg]&quot;</span><span class="p">)</span>
+        <span class="n">pl</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Ta [K]&quot;</span><span class="p">)</span>
+        <span class="n">pl</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;raw data&quot;</span><span class="p">)</span>
+        <span class="n">pl</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;best&quot;</span><span class="p">)</span>
+        <span class="n">pl</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">saveas</span><span class="p">)</span>
+        <span class="n">pl</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s1">&#39;all&#39;</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="PlotManager.overplot_raw_data"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.plot_manager.PlotManager.overplot_raw_data">[docs]</a>    <span class="k">def</span> <span class="nf">overplot_raw_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">xlabel</span><span class="p">,</span> <span class="n">ylabel</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">saveas</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; make two plots overlayed on each other &quot;&quot;&quot;</span>
+
+        <span class="n">pl</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Raw vs &quot;</span><span class="o">+</span><span class="n">title</span><span class="p">)</span>
+        <span class="n">pl</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Offset [Deg]&quot;</span><span class="p">)</span>
+        <span class="n">pl</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Ta [K]&quot;</span><span class="p">)</span>
+        <span class="n">pl</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rawX</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rawY</span><span class="p">,</span> <span class="s2">&quot;C0&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Raw data&quot;</span><span class="p">)</span>
+        <span class="n">pl</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">title</span><span class="p">)</span>
+        <span class="n">pl</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;best&quot;</span><span class="p">)</span>
+        <span class="n">pl</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">saveas</span><span class="p">)</span>
+        <span class="c1">#pl.show()</span>
+        <span class="n">pl</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s1">&#39;all&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PlotManager.plot_result"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.plot_manager.PlotManager.plot_result">[docs]</a>    <span class="k">def</span> <span class="nf">plot_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">peakPts</span><span class="p">,</span> <span class="n">pt</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plot the result of the corrected data and save to file.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">            x : float array of size N</span>
+<span class="sd">                data for the x-axis</span>
+<span class="sd">            y : float array of size N</span>
+<span class="sd">                data for the y-axis</span>
+<span class="sd">            peakPts : locations where peak was fit</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">loc</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># legend location: upper right corner</span>
+        <span class="n">PLOT_PATH</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_plot_path</span><span class="p">()</span>
+
+        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Plot of &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;OBJECT&#39;</span><span class="p">]</span><span class="o">+</span><span class="s2">&quot; observation &quot;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">[:</span><span class="mi">18</span><span class="p">]</span><span class="o">+</span><span class="s2">&quot; at ( &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;CENTFREQ&#39;</span><span class="p">])</span><span class="o">+</span><span class="s2">&quot; MHz)&quot;</span>
+        <span class="n">xlabel</span><span class="o">=</span><span class="s2">&quot;Scandist [deg]&quot;</span>
+        <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;Ta [K]&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">keep</span> <span class="o">==</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span>
+            <span class="n">saveloc</span><span class="o">=</span><span class="s1">&#39;rawPlots&#39;</span><span class="o">+</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">PLOT_PATH</span><span class="p">[</span><span class="mi">5</span><span class="p">:])</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="s1">&#39;rawPlots&#39;</span><span class="o">+</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">PLOT_PATH</span><span class="p">[</span><span class="mi">5</span><span class="p">:]))</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">pass</span>
+            
+            <span class="n">plotPath</span> <span class="o">=</span> <span class="s1">&#39;rawPlots&#39;</span><span class="o">+</span><span class="n">PLOT_PATH</span><span class="p">[</span><span class="mi">5</span><span class="p">:]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">plot_raw_beam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rawX</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rawY</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span>  <span class="n">plotPath</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="c1"># create y=0 line</span>
+        <span class="n">zero</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="c1"># create plot layout</span>
+        <span class="n">gridsize</span> <span class="o">=</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+        <span class="n">ax1</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">subplot2grid</span><span class="p">(</span><span class="n">gridsize</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">colspan</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">rowspan</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">pt</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span>
+                <span class="s2">&quot;Plot of &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">[:</span><span class="mi">18</span><span class="p">]</span><span class="o">+</span><span class="s2">&quot;, deleted &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">pt</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot; pts&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1">#ax1.set_title(&quot;Plot of &quot; + self.name[:18])</span>
+            <span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Plot of &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;OBJECT&#39;</span><span class="p">]</span><span class="o">+</span><span class="s2">&quot; observation &quot;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">[:</span><span class="mi">18</span><span class="p">]</span><span class="o">+</span><span class="s2">&quot; at ( &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;CENTFREQ&#39;</span><span class="p">])</span><span class="o">+</span><span class="s2">&quot; MHz)&quot;</span><span class="p">)</span>
+
+
+        <span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Ta [K]&quot;</span><span class="p">)</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Scandist [deg]&quot;</span><span class="p">)</span>
+        <span class="n">col</span> <span class="o">=</span> <span class="s1">&#39;k&#39;</span><span class="c1">#&#39;b&#39;  # color of fit locations</span>
+
+        <span class="c1"># main plot</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="s1">&#39;k&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;data&quot;</span><span class="p">)</span>  <span class="c1"># cleaned data</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">peakPts</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">peakPts</span><span class="p">],</span> <span class="n">col</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;peak fit data&quot;</span><span class="p">)</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">peakPts</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">peakModel</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Ta [K] = </span><span class="si">%.3f</span><span class="s2"> +- </span><span class="si">%.3f</span><span class="s2">&quot;</span> <span class="o">%</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">peakModel</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">peakRms</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">saveLocs</span><span class="o">==</span><span class="s2">&quot;y&quot;</span><span class="p">:</span>
+            <span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">baseLeft</span><span class="p">],</span>    <span class="n">y</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">baseLeft</span><span class="p">],</span> <span class="n">col</span><span class="o">+</span><span class="s2">&quot;.&quot;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;baseline fit locs&quot;</span><span class="p">)</span>
+            <span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">baseRight</span><span class="p">],</span>  <span class="n">y</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">baseRight</span><span class="p">],</span> <span class="n">col</span><span class="o">+</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">zero</span><span class="p">,</span> <span class="s1">&#39;gray&#39;</span><span class="p">)</span>
+        <span class="n">lim</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="n">loc</span><span class="p">)</span>
+
+        <span class="c1"># plot 2</span>
+        <span class="n">ax2</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">subplot2grid</span><span class="p">(</span><span class="n">gridsize</span><span class="p">,</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plot_residuals</span><span class="p">(</span><span class="n">ax2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">driftRes</span><span class="p">,</span> <span class="s2">&quot;Residual of baseline fit&quot;</span><span class="p">,</span> <span class="n">loc</span><span class="p">)</span>
+
+        <span class="c1"># ax21=pl.subplot2grid(gridsize, (4, 1))</span>
+        <span class="c1"># ax21.hist(self.driftRes,bins=50, orientation=&quot;horizontal&quot;,density=True)</span>
+        <span class="c1"># ax21.set_xlabel(&#39;Distribution&#39;)</span>
+
+        <span class="c1"># plot 3</span>
+        <span class="n">ax3</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">subplot2grid</span><span class="p">(</span><span class="n">gridsize</span><span class="p">,</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plot_residuals</span><span class="p">(</span><span class="n">ax3</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fitRes</span><span class="p">,</span> <span class="s2">&quot;Residual of peak fit&quot;</span><span class="p">,</span> <span class="n">loc</span><span class="p">)</span>
+
+        <span class="n">pl</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">PLOT_PATH</span><span class="p">)</span>
+        <span class="n">pl</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s1">&#39;all&#39;</span><span class="p">)</span> <span class="c1">#fig</span></div>
+        <span class="c1">#sys.exit()</span>
+
+<div class="viewcode-block" id="PlotManager.plot_residuals"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.plot_manager.PlotManager.plot_residuals">[docs]</a>    <span class="k">def</span> <span class="nf">plot_residuals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">loc</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Data plotting configuration for residuals &quot;&quot;&quot;</span>
+
+        <span class="n">x</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+
+        <span class="n">axis</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+        <span class="n">pl</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;data&quot;</span><span class="p">)</span>
+        <span class="c1"># pl.ylim((-0.5,0.5))</span>
+        <span class="n">pl</span><span class="o">.</span><span class="n">ylim</span><span class="p">((</span><span class="o">-</span><span class="mf">.1</span><span class="o">-</span><span class="nb">max</span><span class="p">(</span><span class="n">data</span><span class="p">),</span><span class="nb">max</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">+</span><span class="mf">.1</span><span class="p">))</span>
+        <span class="n">pl</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+        <span class="c1">#pl.show()</span>
+        <span class="c1">#print(np.zeros(len(data)))</span>
+
+        <span class="c1"># print(min(data),max(data), abs(min(data)/max(data)), abs(max(data)/min(data)) )</span>
+
+        <span class="c1"># if abs(min(data)) &gt; ((abs(max(data))) + 0.5*abs(max(data))):</span>
+        <span class="c1">#     sys.exit()</span>
+        <span class="c1"># elif abs(max(data)) &gt; ((abs(min(data))) + 0.5*abs(min(data))):</span>
+        <span class="c1">#     sys.exit()</span>
+        <span class="c1"># else:</span>
+        <span class="c1">#     pass</span>
+
+        <span class="c1"># coeffs=np.polyfit(x, data, 1)</span>
+        <span class="c1"># model = np.polyval(coeffs, x)</span>
+        <span class="c1"># print(coeffs)</span>
+        <span class="c1"># sys.exit()</span>
+        <span class="n">axis</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;res [K]&quot;</span><span class="p">)</span>
+        <span class="n">axis</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;N&quot;</span><span class="p">)</span>
+        <span class="n">axis</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="n">loc</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PlotManager.plot_basic_db"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.plot_manager.PlotManager.plot_basic_db">[docs]</a>    <span class="k">def</span> <span class="nf">plot_basic_db</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plot results of dual beam data fitting.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># setup plot basics</span>
+        <span class="n">loc</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># legend location: upper right corner</span>
+        <span class="n">PLOT_PATH</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_plot_path</span><span class="p">()</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Plot of &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;OBJECT&#39;</span><span class="p">]</span><span class="o">+</span><span class="s2">&quot; observation &quot;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">[:</span><span class="mi">18</span><span class="p">]</span><span class="o">+</span><span class="s2">&quot; at ( &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;CENTFREQ&#39;</span><span class="p">])</span><span class="o">+</span><span class="s2">&quot; MHz)&quot;</span>
+        <span class="c1">#print(title)</span>
+        <span class="c1">#sys.exit()</span>
+        <span class="n">xlabel</span><span class="o">=</span><span class="s2">&quot;Scandist [deg]&quot;</span>
+        <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;Ta [K]&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">keep</span> <span class="o">==</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span>
+            <span class="n">saveloc</span><span class="o">=</span><span class="s1">&#39;rawPlots&#39;</span><span class="o">+</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">PLOT_PATH</span><span class="p">[</span><span class="mi">5</span><span class="p">:])</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="s1">&#39;rawPlots&#39;</span><span class="o">+</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">PLOT_PATH</span><span class="p">[</span><span class="mi">5</span><span class="p">:]))</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">pass</span>
+            
+            <span class="n">plotPath</span> <span class="o">=</span> <span class="s1">&#39;rawPlots&#39;</span><span class="o">+</span><span class="n">PLOT_PATH</span><span class="p">[</span><span class="mi">5</span><span class="p">:]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">plot_raw_beam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rawX</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rawY</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span>  <span class="n">plotPath</span><span class="p">)</span>
+
+        <span class="c1">#sys.exit()</span>
+        <span class="n">col</span> <span class="o">=</span> <span class="s1">&#39;r&#39;</span>
+
+        <span class="c1"># create y=0 line</span>
+        <span class="n">zero</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="c1"># create plot layout</span>
+        <span class="n">gridsize</span> <span class="o">=</span> <span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+        <span class="n">ax1</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">subplot2grid</span><span class="p">(</span><span class="n">gridsize</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">colspan</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">rowspan</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+        <span class="n">zero</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> 
+        <span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">ylabel</span><span class="p">)</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">xlabel</span><span class="p">)</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+
+        <span class="c1"># split baselocs</span>
+        <span class="n">baseLeft</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">baseLocs</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">baseRight</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseLocs</span><span class="p">[</span><span class="n">baseLeft</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">:]</span>
+
+        <span class="c1"># main plot</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;raw data&quot;</span><span class="p">)</span>
+
+        <span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xPeakDataAbeam</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">yPeakDataAbeam</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span>
+                 <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Ta [K] = </span><span class="si">%.3f</span><span class="s2"> +- </span><span class="si">%.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">yMaxAbeam</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">erryMaxAbeam</span><span class="p">))</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xPeakDataBbeam</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">yPeakDataBbeam</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span>
+                 <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Ta [K] = </span><span class="si">%.3f</span><span class="s2"> +- </span><span class="si">%.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">yMinBbeam</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">erryMinBbeam</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">saveLocs</span><span class="o">==</span><span class="s2">&quot;y&quot;</span><span class="p">:</span>
+            <span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">baseLeft</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">baseLeft</span><span class="p">],</span> <span class="n">col</span><span class="o">+</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
+            <span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">baseRight</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">baseRight</span><span class="p">],</span> <span class="n">col</span><span class="o">+</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">zero</span><span class="p">,</span> <span class="s1">&#39;gray&#39;</span><span class="p">)</span>
+
+        <span class="n">lim</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
+
+        <span class="n">ax1</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="n">loc</span><span class="p">)</span>
+
+        <span class="c1"># residual of baseline block</span>
+        <span class="n">ax2</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">subplot2grid</span><span class="p">(</span><span class="n">gridsize</span><span class="p">,</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">colspan</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">rowspan</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="c1">#ax21=</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plot_residuals</span><span class="p">(</span><span class="n">ax2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">driftRes</span><span class="p">,</span> <span class="s2">&quot;Residual of base fit&quot;</span><span class="p">,</span> <span class="n">loc</span><span class="p">)</span>
+
+        <span class="c1"># residual of left peak</span>
+        <span class="n">ax3</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">subplot2grid</span><span class="p">(</span><span class="n">gridsize</span><span class="p">,</span> <span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plot_residuals</span><span class="p">(</span><span class="n">ax3</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resAbeam</span><span class="p">,</span> <span class="s2">&quot;Residual of peak A&quot;</span><span class="p">,</span> <span class="n">loc</span><span class="p">)</span>
+
+        <span class="c1"># residual of right peak</span>
+        <span class="n">ax4</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">subplot2grid</span><span class="p">(</span><span class="n">gridsize</span><span class="p">,</span> <span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plot_residuals</span><span class="p">(</span><span class="n">ax4</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resBbeam</span><span class="p">,</span> <span class="s2">&quot;Residual of peak B&quot;</span><span class="p">,</span> <span class="n">loc</span><span class="p">)</span>
+
+        <span class="c1">#pl.show()</span>
+        <span class="n">pl</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">PLOT_PATH</span><span class="p">)</span>
+        <span class="n">pl</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s1">&#39;all&#39;</span><span class="p">)</span><span class="c1">#fig</span></div></div>
+        <span class="c1">#sys.exit()</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">dran v1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">src.common.plot_manager</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2023, Pfesi van Zyl.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
+    </div>
+  </body>
+</html>

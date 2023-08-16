@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.gui package &mdash; dran v1.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            dran
+          </a>
+              <div class="version">
+                v1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../extras/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../extras/caveats.html">Caveats</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../extras/quickstart.html">Quickstart Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../extras/cli.html">The command line interface (CLI)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../extras/gui.html">The graphical user interface (GUI)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../extras/gui.html#the-landing-page">The landing page</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../extras/gui.html#edit-driftscan">Edit driftscan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../extras/gui.html#edit-time-series">Edit Time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../extras/gui.html#view-plots">View plots</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../extras/rfi.html">Radio frequency interference (RFI)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../extras/tuts/tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../extras/commands.html">Commands</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">dran</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">src.gui package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/docs/src.gui.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="src-gui-package">
+<h1>src.gui package<a class="headerlink" href="#src-gui-package" title="Permalink to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="src-gui-canvas-manager-module">
+<h2>src.gui.canvas_manager module<a class="headerlink" href="#src-gui-canvas-manager-module" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-src.gui.edit_driftscan_window">
+<span id="src-gui-edit-driftscan-window-module"></span><h2>src.gui.edit_driftscan_window module<a class="headerlink" href="#module-src.gui.edit_driftscan_window" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.gui.edit_driftscan_window.Ui_DriftscanWindow">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.gui.edit_driftscan_window.</span></span><span class="sig-name descname"><span class="pre">Ui_DriftscanWindow</span></span><a class="reference internal" href="../_modules/src/gui/edit_driftscan_window.html#Ui_DriftscanWindow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.edit_driftscan_window.Ui_DriftscanWindow" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.gui.edit_driftscan_window.Ui_DriftscanWindow.retranslateUi">
+<span class="sig-name descname"><span class="pre">retranslateUi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">DriftscanWindow</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/gui/edit_driftscan_window.html#Ui_DriftscanWindow.retranslateUi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.edit_driftscan_window.Ui_DriftscanWindow.retranslateUi" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.gui.edit_driftscan_window.Ui_DriftscanWindow.setupUi">
+<span class="sig-name descname"><span class="pre">setupUi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">DriftscanWindow</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/gui/edit_driftscan_window.html#Ui_DriftscanWindow.setupUi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.edit_driftscan_window.Ui_DriftscanWindow.setupUi" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-src.gui.edit_timeseries_window">
+<span id="src-gui-edit-timeseries-window-module"></span><h2>src.gui.edit_timeseries_window module<a class="headerlink" href="#module-src.gui.edit_timeseries_window" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.gui.edit_timeseries_window.Ui_TimeSeriesWindow">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.gui.edit_timeseries_window.</span></span><span class="sig-name descname"><span class="pre">Ui_TimeSeriesWindow</span></span><a class="reference internal" href="../_modules/src/gui/edit_timeseries_window.html#Ui_TimeSeriesWindow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.edit_timeseries_window.Ui_TimeSeriesWindow" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.gui.edit_timeseries_window.Ui_TimeSeriesWindow.retranslateUi">
+<span class="sig-name descname"><span class="pre">retranslateUi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">TimeSeriesWindow</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/gui/edit_timeseries_window.html#Ui_TimeSeriesWindow.retranslateUi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.edit_timeseries_window.Ui_TimeSeriesWindow.retranslateUi" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.gui.edit_timeseries_window.Ui_TimeSeriesWindow.setupUi">
+<span class="sig-name descname"><span class="pre">setupUi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">TimeSeriesWindow</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/gui/edit_timeseries_window.html#Ui_TimeSeriesWindow.setupUi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.edit_timeseries_window.Ui_TimeSeriesWindow.setupUi" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-src.gui.main_window">
+<span id="src-gui-main-window-module"></span><h2>src.gui.main_window module<a class="headerlink" href="#module-src.gui.main_window" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.gui.main_window.Ui_MainWindow">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.gui.main_window.</span></span><span class="sig-name descname"><span class="pre">Ui_MainWindow</span></span><a class="reference internal" href="../_modules/src/gui/main_window.html#Ui_MainWindow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.main_window.Ui_MainWindow" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.gui.main_window.Ui_MainWindow.retranslateUi">
+<span class="sig-name descname"><span class="pre">retranslateUi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">MainWindow</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/gui/main_window.html#Ui_MainWindow.retranslateUi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.main_window.Ui_MainWindow.retranslateUi" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.gui.main_window.Ui_MainWindow.setupUi">
+<span class="sig-name descname"><span class="pre">setupUi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">MainWindow</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/gui/main_window.html#Ui_MainWindow.setupUi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.main_window.Ui_MainWindow.setupUi" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="src-gui-secondary-canvas-manager-module">
+<h2>src.gui.secondary_canvas_manager module<a class="headerlink" href="#src-gui-secondary-canvas-manager-module" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-src.gui.timeseries_canvas">
+<span id="src-gui-timeseries-canvas-module"></span><h2>src.gui.timeseries_canvas module<a class="headerlink" href="#module-src.gui.timeseries_canvas" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.gui.timeseries_canvas.TimeCanvas">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.gui.timeseries_canvas.</span></span><span class="sig-name descname"><span class="pre">TimeCanvas</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hgt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plotName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/gui/timeseries_canvas.html#TimeCanvas"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.timeseries_canvas.TimeCanvas" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">FigureCanvasQTAgg</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.gui.timeseries_canvas.TimeCanvas.clear_figure">
+<span class="sig-name descname"><span class="pre">clear_figure</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/gui/timeseries_canvas.html#TimeCanvas.clear_figure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.timeseries_canvas.TimeCanvas.clear_figure" title="Permalink to this definition"></a></dt>
+<dd><p>Clear the current figure</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.gui.timeseries_canvas.TimeCanvas.dday">
+<span class="sig-name descname"><span class="pre">dday</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/gui/timeseries_canvas.html#TimeCanvas.dday"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.timeseries_canvas.TimeCanvas.dday" title="Permalink to this definition"></a></dt>
+<dd><p>Date handler</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.gui.timeseries_canvas.TimeCanvas.onclick">
+<span class="sig-name descname"><span class="pre">onclick</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/gui/timeseries_canvas.html#TimeCanvas.onclick"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.timeseries_canvas.TimeCanvas.onclick" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.gui.timeseries_canvas.TimeCanvas.onpick">
+<span class="sig-name descname"><span class="pre">onpick</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/gui/timeseries_canvas.html#TimeCanvas.onpick"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.timeseries_canvas.TimeCanvas.onpick" title="Permalink to this definition"></a></dt>
+<dd><p>Click event handler.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.gui.timeseries_canvas.TimeCanvas.plot_dual_fig">
+<span class="sig-name descname"><span class="pre">plot_dual_fig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlab</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylab</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Main</span> <span class="pre">database</span> <span class="pre">plot</span> <span class="pre">window'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'C0.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/gui/timeseries_canvas.html#TimeCanvas.plot_dual_fig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.timeseries_canvas.TimeCanvas.plot_dual_fig" title="Permalink to this definition"></a></dt>
+<dd><p>Plot a figure.</p>
+<blockquote>
+<div><p>A helper function to make a graph</p>
+<dl class="simple">
+<dt>ax<span class="classifier">Axes</span></dt><dd><p>The axes to draw to</p>
+</dd>
+</dl>
+<p>data1 : array
+The x data</p>
+<p>data2 : array
+The y data</p>
+<p>param_dict : dict
+Dictionary of kwargs to pass to ax.plot</p>
+<dl class="simple">
+<dt>out<span class="classifier">list</span></dt><dd><p>list of artists added</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.gui.timeseries_canvas.TimeCanvas.plot_fig">
+<span class="sig-name descname"><span class="pre">plot_fig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlab</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylab</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Main</span> <span class="pre">database</span> <span class="pre">plot</span> <span class="pre">window'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'C0.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yerr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/gui/timeseries_canvas.html#TimeCanvas.plot_fig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.timeseries_canvas.TimeCanvas.plot_fig" title="Permalink to this definition"></a></dt>
+<dd><p>Plot a figure.</p>
+<blockquote>
+<div><p>A helper function to make a graph</p>
+<dl class="simple">
+<dt>ax<span class="classifier">Axes</span></dt><dd><p>The axes to draw to</p>
+</dd>
+</dl>
+<p>data1 : array
+The x data</p>
+<p>data2 : array
+The y data</p>
+<p>param_dict : dict
+Dictionary of kwargs to pass to ax.plot</p>
+<dl class="simple">
+<dt>out<span class="classifier">list</span></dt><dd><p>list of artists added</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.gui.timeseries_canvas.TimeCanvas.plot_fig_errs">
+<span class="sig-name descname"><span class="pre">plot_fig_errs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlab</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylab</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Main</span> <span class="pre">database</span> <span class="pre">plot</span> <span class="pre">window'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'C0.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/gui/timeseries_canvas.html#TimeCanvas.plot_fig_errs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.timeseries_canvas.TimeCanvas.plot_fig_errs" title="Permalink to this definition"></a></dt>
+<dd><p>Plot a figure with errorbars.</p>
+<blockquote>
+<div><p>A helper function to make a graph</p>
+<dl class="simple">
+<dt>ax<span class="classifier">Axes</span></dt><dd><p>The axes to draw to</p>
+</dd>
+</dl>
+<p>data1 : array
+The x data</p>
+<p>data2 : array
+The y data</p>
+<p>param_dict : dict
+Dictionary of kwargs to pass to ax.plot</p>
+<dl class="simple">
+<dt>out<span class="classifier">list</span></dt><dd><p>list of artists added</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.gui.timeseries_canvas.TimeCanvas.pop">
+<span class="sig-name descname"><span class="pre">pop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/gui/timeseries_canvas.html#TimeCanvas.pop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.timeseries_canvas.TimeCanvas.pop" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.gui.timeseries_canvas.TimeCanvas.reset_lists">
+<span class="sig-name descname"><span class="pre">reset_lists</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/gui/timeseries_canvas.html#TimeCanvas.reset_lists"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.timeseries_canvas.TimeCanvas.reset_lists" title="Permalink to this definition"></a></dt>
+<dd><p>Setup lists to store data for the click_index and fit_points.
+click_index : the indeces of the points clicked on the figure.
+fit_points: the values of the click_index</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.gui.timeseries_canvas.TimeCanvas.setLabels">
+<span class="sig-name descname"><span class="pre">setLabels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'My</span> <span class="pre">title'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/gui/timeseries_canvas.html#TimeCanvas.setLabels"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.timeseries_canvas.TimeCanvas.setLabels" title="Permalink to this definition"></a></dt>
+<dd><p>Set labels for basic plot.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.gui.timeseries_canvas.TimeCanvas.setLabelsNoLegend">
+<span class="sig-name descname"><span class="pre">setLabelsNoLegend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'My</span> <span class="pre">title'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/gui/timeseries_canvas.html#TimeCanvas.setLabelsNoLegend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.timeseries_canvas.TimeCanvas.setLabelsNoLegend" title="Permalink to this definition"></a></dt>
+<dd><p>Set labels for basic plot.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.gui.timeseries_canvas.TimeCanvas.show_plots">
+<span class="sig-name descname"><span class="pre">show_plots</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ind</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/gui/timeseries_canvas.html#TimeCanvas.show_plots"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.timeseries_canvas.TimeCanvas.show_plots" title="Permalink to this definition"></a></dt>
+<dd><p>Show plots on click event in html browser.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-src.gui.view_plots_window">
+<span id="src-gui-view-plots-window-module"></span><h2>src.gui.view_plots_window module<a class="headerlink" href="#module-src.gui.view_plots_window" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.gui.view_plots_window.Ui_PlotViewer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.gui.view_plots_window.</span></span><span class="sig-name descname"><span class="pre">Ui_PlotViewer</span></span><a class="reference internal" href="../_modules/src/gui/view_plots_window.html#Ui_PlotViewer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.view_plots_window.Ui_PlotViewer" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.gui.view_plots_window.Ui_PlotViewer.retranslateUi">
+<span class="sig-name descname"><span class="pre">retranslateUi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">PlotViewer</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/gui/view_plots_window.html#Ui_PlotViewer.retranslateUi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.view_plots_window.Ui_PlotViewer.retranslateUi" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.gui.view_plots_window.Ui_PlotViewer.setupUi">
+<span class="sig-name descname"><span class="pre">setupUi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">PlotViewer</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/gui/view_plots_window.html#Ui_PlotViewer.setupUi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.view_plots_window.Ui_PlotViewer.setupUi" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-src.gui">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-src.gui" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Pfesi van Zyl.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

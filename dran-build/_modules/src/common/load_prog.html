@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.common.load_prog &mdash; dran v1.0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            dran
+          </a>
+              <div class="version">
+                v1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/caveats.html">Caveats</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/quickstart.html">Quickstart Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/cli.html">The command line interface (CLI)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/gui.html">The graphical user interface (GUI)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/gui.html#the-landing-page">The landing page</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/gui.html#edit-driftscan">Edit driftscan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/gui.html#edit-time-series">Edit Time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/gui.html#view-plots">View plots</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/rfi.html">Radio frequency interference (RFI)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/tuts/tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/commands.html">Commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/modules.html">src</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">dran</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.common.load_prog</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for src.common.load_prog</h1><div class="highlight"><pre>
+<span></span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="c1"># Local imports</span>
+<span class="c1"># --------------------------------------------------------------------------- #</span>
+<span class="kn">from</span> <span class="nn">common.messaging</span> <span class="kn">import</span> <span class="n">msg_wrapper</span><span class="p">,</span> <span class="n">print_start</span><span class="p">,</span> <span class="n">load_prog</span>
+<span class="kn">from</span> <span class="nn">common.quick_reader</span> <span class="kn">import</span> <span class="n">QuickReader</span>
+<span class="kn">from</span> <span class="nn">common.log_conf</span> <span class="kn">import</span> <span class="n">configure_logging</span>
+<span class="kn">from</span> <span class="nn">common.sqlite_db</span> <span class="kn">import</span> <span class="n">SQLiteDB</span>
+<span class="kn">from</span> <span class="nn">common.file_handler</span> <span class="kn">import</span> <span class="n">FileHandler</span>
+
+<div class="viewcode-block" id="LoadProg"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.load_prog.LoadProg">[docs]</a><span class="k">class</span> <span class="nc">LoadProg</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Run common initialization processes depending on user input&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">args</span><span class="p">,</span><span class="n">log</span><span class="p">):</span>
+        <span class="c1"># print(args)</span>
+
+        
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">quickview</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">f</span><span class="p">:</span>
+                <span class="n">quick</span> <span class="o">=</span> <span class="n">QuickReader</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">f</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;error&quot;</span><span class="p">,</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">,</span><span class="s2">&quot;quickview requires a file fo view&quot;</span><span class="p">)</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">pass</span>
+        
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">conv</span><span class="o">==</span> <span class="s2">&quot;CALDB.db&quot;</span> <span class="ow">or</span> <span class="n">args</span><span class="o">.</span><span class="n">conv</span> <span class="o">==</span> <span class="s2">&quot;TARDB.db&quot;</span><span class="p">:</span>
+
+            <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;info&quot;</span><span class="p">,</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;Converting </span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">conv</span><span class="si">}</span><span class="s1"> tables to csv files&#39;</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">db</span><span class="o">=</span><span class="n">SQLiteDB</span><span class="p">(</span><span class="n">databaseName</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">conv</span><span class="p">,</span><span class="n">log</span><span class="o">=</span><span class="n">log</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;error&quot;</span><span class="p">,</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">,</span><span class="s2">&quot;Please enter a valid SQLite database name&quot;</span><span class="p">)</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">create_db</span><span class="p">()</span>
+            <span class="n">dbTables</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_table_names</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">conv</span><span class="p">)</span>
+            
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dbTables</span><span class="p">)):</span>
+                <span class="n">ind</span><span class="p">,</span> <span class="n">col_names</span><span class="p">,</span> <span class="n">col_type</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_table_coloumns</span><span class="p">(</span><span class="n">dbTables</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">rows</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_rows</span><span class="p">(</span><span class="n">dbTables</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+    
+                <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;info&quot;</span><span class="p">,</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;Converting table </span><span class="si">{</span><span class="n">dbTables</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s1"> to csv file.&#39;</span><span class="p">)</span>
+                
+                <span class="c1">#Get rows from specified table</span>
+                <span class="n">ind</span><span class="p">,</span> <span class="n">col_names</span><span class="p">,</span> <span class="n">col_type</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_all_table_coloumns</span><span class="p">(</span><span class="n">dbTables</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">rows</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_rows_of_cols</span><span class="p">(</span><span class="n">dbTables</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">col_names</span><span class="p">)</span>
+
+                <span class="c1"># create dataframe</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">rows</span><span class="p">),</span> <span class="n">columns</span> <span class="o">=</span> <span class="n">col_names</span><span class="p">)</span>
+                <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">dbTables</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">+</span><span class="s2">&quot;.csv&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">conv</span><span class="o">==</span><span class="kc">None</span><span class="p">:</span>
+            <span class="k">pass</span>        
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Please enter a valid SQLite database name</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">delete_db</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">&quot;.db&quot;</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">delete_db</span><span class="p">:</span>
+                <span class="n">fh</span> <span class="o">=</span> <span class="n">FileHandler</span><span class="p">(</span><span class="n">log</span><span class="p">,</span><span class="n">args</span><span class="o">.</span><span class="n">delete_db</span><span class="p">)</span>
+
+                <span class="c1"># delete given database name</span>
+                <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span> <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span>
+                            <span class="sa">f</span><span class="s2">&quot;Deleting </span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">delete_db</span><span class="si">}</span><span class="s2"> database.&quot;</span><span class="p">)</span>
+                <span class="n">fh</span><span class="o">.</span><span class="n">delete_file</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">delete_db</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The database &#39;</span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">delete_db</span><span class="si">}</span><span class="s2">&#39; does not exists&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Check the name and try again</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+        <span class="c1"># if args.deleteFrom:</span>
+        <span class="c1"># Delete an observation from the dtabase</span>
+        <span class="c1">#     if (args.deleteFrom != None) and (args.f != None):</span>
+        <span class="c1">#         msg_wrapper(&quot;debug&quot;,log.debug,f&quot;Deleting row from {args.deleteFrom} database&quot;)</span>
+
+        <span class="c1">#         # Delete row from database given the database name and filename</span>
+        <span class="c1">#         dbName = args.deleteFrom </span>
+        <span class="c1">#         filePath  = args.f</span>
+
+        <span class="c1">#         # get file and table to process</span>
+        <span class="c1">#         fh = FileHandler(log,filePath)</span>
+        <span class="c1">#         table=(fh.folderName).lower()</span>
+        <span class="c1">#         file=fh.fileName</span>
+
+        <span class="c1">#         # check if database exists</span>
+        <span class="c1">#         db = SQLiteDB(databaseName=dbName,log=log)</span>
+        <span class="c1">#         isDB=db.db_exists(db.databaseName)</span>
+        <span class="c1">#         if isDB == True:</span>
+        <span class="c1">#             db.create_db()</span>
+        <span class="c1">#         else:</span>
+        <span class="c1">#             print(f&#39;The database {dbName} does not exists.\n&#39;)</span>
+        <span class="c1">#             sys.exit()</span>
+
+        <span class="c1">#         # Get all tables in database</span>
+        <span class="c1">#         dbTables = db.get_table_names(dbName)</span>
+        <span class="c1">#         if table in dbTables:</span>
+        <span class="c1">#             # Get rows from specified table</span>
+        <span class="c1">#             data = db.select_row(table,file)</span>
+            
+        <span class="c1">#             if len(data) &gt;= 1:</span>
+        <span class="c1">#                 db.delete_row(table,file)</span>
+        <span class="c1">#             else:</span>
+        <span class="c1">#                 print(f&#39;The entry for file {file} does not exist in table {table}.\n&#39;)</span>
+        <span class="c1">#                 sys.exit()</span>
+        <span class="c1">#         else:</span>
+        <span class="c1">#             print(f&#39;{table} table does not exist. \n&#39;)</span>
+        <span class="c1">#             sys.exit()</span>
+        <span class="c1">#         sys.exit()</span>
+        <span class="c1">#     else:</span>
+        <span class="c1">#         if args.f == None:</span>
+        <span class="c1">#             msg_wrapper(&quot;debug&quot;, log.debug,f&quot;No file name given to delete.&quot;)</span>
+
+
+        
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Pfesi van Zyl.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

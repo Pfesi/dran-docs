@@ -1,0 +1,141 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>src.common.messaging &#8212; dran v1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/nature.css" />
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/sphinx_highlight.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">dran v1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">src.common.messaging</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for src.common.messaging</h1><div class="highlight"><pre>
+<span></span><span class="c1"># =========================================================================== #</span>
+<span class="c1"># File   : messages.py                                                        #</span>
+<span class="c1"># Author : Pfesesani V. van Zyl                                               #</span>
+<span class="c1"># =========================================================================== #</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<div class="viewcode-block" id="print_start"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.messaging.print_start">[docs]</a><span class="k">def</span> <span class="nf">print_start</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Print program banner. &quot;&quot;&quot;</span>
+
+    <span class="n">no_tabs</span> <span class="o">=</span> <span class="mi">2</span> <span class="c1"># number of tab spaces</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;###########&quot;</span><span class="o">*</span><span class="p">(</span><span class="n">no_tabs</span><span class="o">*</span><span class="mi">3</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="o">*</span><span class="p">(</span><span class="n">no_tabs</span><span class="o">*</span><span class="mi">4</span><span class="p">),</span> <span class="s2">&quot;#&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="o">*</span><span class="n">no_tabs</span><span class="p">,</span> <span class="s2">&quot;######  ######  ###### #    # &quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="o">*</span><span class="n">no_tabs</span><span class="p">,</span> <span class="s2">&quot;#&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="o">*</span><span class="n">no_tabs</span><span class="p">,</span> <span class="s2">&quot;#     # #    #  #    # # #  # &quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="o">*</span><span class="n">no_tabs</span><span class="p">,</span> <span class="s2">&quot;#&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="o">*</span><span class="n">no_tabs</span><span class="p">,</span> <span class="s2">&quot;#     # #####   ###### #  # # &quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="o">*</span><span class="n">no_tabs</span><span class="p">,</span> <span class="s2">&quot;#&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="o">*</span><span class="n">no_tabs</span><span class="p">,</span> <span class="s2">&quot;#     # #    #  #    # #   ## &quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="o">*</span><span class="n">no_tabs</span><span class="p">,</span> <span class="s2">&quot;#&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="o">*</span><span class="n">no_tabs</span><span class="p">,</span> <span class="s2">&quot;######  #    #  #    # #    # &quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="o">*</span><span class="n">no_tabs</span><span class="p">,</span> <span class="s2">&quot;#&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="o">*</span><span class="p">(</span><span class="n">no_tabs</span><span class="o">*</span><span class="mi">4</span><span class="p">),</span> <span class="s2">&quot;#&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;###########&quot;</span><span class="o">*</span><span class="p">(</span><span class="n">no_tabs</span><span class="o">*</span><span class="mi">3</span><span class="p">))</span>
+    <span class="n">disclaimer</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="disclaimer"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.messaging.disclaimer">[docs]</a><span class="k">def</span> <span class="nf">disclaimer</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Print disclaimer. &quot;&quot;&quot;</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">* Disclaimer *: DRAN is a data reduction and analysis software &quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;pipeline developed to systematically reduce and analyze HartRAO&#39;s &quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;26m telescope drift scan data. It comes with no guarantees &quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;whatsoever, but the author does attempt to assist those who use it&quot;</span><span class="p">)</span> 
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;to get meaningful results.&quot;</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="msg_wrapper"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.messaging.msg_wrapper">[docs]</a><span class="k">def</span> <span class="nf">msg_wrapper</span><span class="p">(</span><span class="n">log_name</span><span class="p">,</span> <span class="n">log</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Wraps logging messages. </span>
+<span class="sd">    </span>
+<span class="sd">        Args:</span>
+<span class="sd">            log_name (str)  : The name of the logger e.g. info</span>
+<span class="sd">            log (object)    : The logging object</span>
+<span class="sd">            msg (str)       : The message to be wrapped.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># setup wrappers</span>
+    <span class="n">wrappers</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;error&#39;</span><span class="p">:</span> <span class="s2">&quot;* ERROR * : &quot;</span><span class="p">,</span>
+        <span class="s1">&#39;warning&#39;</span><span class="p">:</span> <span class="s2">&quot;WARNING! : &quot;</span><span class="p">,</span>
+        <span class="s1">&#39;info&#39;</span><span class="p">:</span> <span class="s2">&quot;# &gt;&gt;&gt; &quot;</span><span class="p">,</span>
+        <span class="s1">&#39;debug&#39;</span><span class="p">:</span> <span class="s2">&quot;&gt; DEBUG : &quot;</span><span class="p">,</span>
+        <span class="s1">&#39;basic&#39;</span><span class="p">:</span> <span class="s2">&quot;# -- &quot;</span>
+    <span class="p">}</span>
+
+    <span class="n">log</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">+</span><span class="n">wrappers</span><span class="p">[</span><span class="n">log_name</span><span class="p">]</span><span class="o">+</span><span class="n">msg</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="load_prog"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.messaging.load_prog">[docs]</a><span class="k">def</span> <span class="nf">load_prog</span><span class="p">(</span><span class="n">prog</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Print message to load the selected program.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;clear&quot;</span><span class="p">)</span>
+    <span class="n">print_start</span><span class="p">()</span>
+    <span class="n">n</span><span class="o">=</span><span class="mi">66</span> <span class="c1"># number of asterics</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;*&quot;</span><span class="o">*</span><span class="n">n</span><span class="p">,</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Loading: </span><span class="si">{</span><span class="n">prog</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;*&quot;</span><span class="o">*</span><span class="n">n</span><span class="p">,</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">dran v1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">src.common.messaging</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2023, Pfesi van Zyl.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
+    </div>
+  </body>
+</html>

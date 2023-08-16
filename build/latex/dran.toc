@@ -1,0 +1,22 @@
+\babel@toc {english}{}
+\contentsline {chapter}{\numberline {1}Introduction}{1}{chapter.1}%
+\contentsline {chapter}{\numberline {2}How does it work ?}{3}{chapter.2}%
+\contentsline {chapter}{\numberline {3}What’s next}{5}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Installation}{5}{section.3.1}%
+\contentsline {subsection}{\numberline {3.1.1}Installing and running dran in an anaconda virtual environment}{5}{subsection.3.1.1}%
+\contentsline {section}{\numberline {3.2}Caveats}{6}{section.3.2}%
+\contentsline {section}{\numberline {3.3}Quickstart Guide}{7}{section.3.3}%
+\contentsline {subsection}{\numberline {3.3.1}Starting the program without commands}{7}{subsection.3.3.1}%
+\contentsline {subsection}{\numberline {3.3.2}Starting the program with command line options}{8}{subsection.3.3.2}%
+\contentsline {section}{\numberline {3.4}The command line interface (CLI)}{10}{section.3.4}%
+\contentsline {subsection}{\numberline {3.4.1}automated data reduction}{11}{subsection.3.4.1}%
+\contentsline {subsection}{\numberline {3.4.2}Manual data reduction}{14}{subsection.3.4.2}%
+\contentsline {section}{\numberline {3.5}The graphical user interface (GUI)}{14}{section.3.5}%
+\contentsline {section}{\numberline {3.6}The landing page}{14}{section.3.6}%
+\contentsline {section}{\numberline {3.7}Edit driftscan}{15}{section.3.7}%
+\contentsline {section}{\numberline {3.8}Edit Time series}{19}{section.3.8}%
+\contentsline {section}{\numberline {3.9}View plots}{21}{section.3.9}%
+\contentsline {section}{\numberline {3.10}Radio frequency interference (RFI)}{23}{section.3.10}%
+\contentsline {section}{\numberline {3.11}Tutorials}{23}{section.3.11}%
+\contentsline {subsection}{\numberline {3.11.1}Data reduction of 2 GHz data.}{23}{subsection.3.11.1}%
+\contentsline {section}{\numberline {3.12}Commands}{25}{section.3.12}%

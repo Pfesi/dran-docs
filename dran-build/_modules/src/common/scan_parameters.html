@@ -1,0 +1,1057 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>src.common.scan_parameters &#8212; dran v1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/nature.css" />
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/sphinx_highlight.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">dran v1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">src.common.scan_parameters</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for src.common.scan_parameters</h1><div class="highlight"><pre>
+<span></span><span class="c1"># ============================================================================#</span>
+<span class="c1"># File: scan_parameters.py                                                    #</span>
+<span class="c1"># Author: Pfesesani V. van Zyl                                                #</span>
+<span class="c1"># ============================================================================#</span>
+
+<span class="c1"># Standard library imports</span>
+<span class="c1"># --------------------------------------------------------------------------- #</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="c1"># =========================================================================== #</span>
+
+
+<div class="viewcode-block" id="ScanParameters"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.scan_parameters.ScanParameters">[docs]</a><span class="k">class</span> <span class="nc">ScanParameters</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Class of parameters to be collected/saved to a database from the drift </span>
+<span class="sd">        scan fits file. These are the values that will be populated in the </span>
+<span class="sd">        CALDB or TARDB databases.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            parameters (dict): dictionary of all properties to be stored.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span> <span class="o">=</span> <span class="p">{}</span>    
+
+<div class="viewcode-block" id="ScanParameters.print_keys"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.scan_parameters.ScanParameters.print_keys">[docs]</a>    <span class="k">def</span> <span class="nf">print_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Print the keys of the dictionary. &quot;&quot;&quot;</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="ScanParameters.print_dict"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.scan_parameters.ScanParameters.print_dict">[docs]</a>    <span class="k">def</span> <span class="nf">print_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Print the dictionary key value pairs. &quot;&quot;&quot;</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2"># parameters: </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="p">[</span><span class="nb">print</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="s2">&quot;: &quot;</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+                <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">values</span><span class="p">()))]</span></div>
+    
+<div class="viewcode-block" id="ScanParameters.reset_dict"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.scan_parameters.ScanParameters.reset_dict">[docs]</a>    <span class="k">def</span> <span class="nf">reset_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Reset the dictionary. &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span> <span class="o">=</span> <span class="p">{}</span></div>
+
+<div class="viewcode-block" id="ScanParameters.combine_parameters"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.scan_parameters.ScanParameters.combine_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">combine_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_dict_entries</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Add new dictionary to existing dictionary.</span>
+
+<span class="sd">            Combine parameters to get a single dictionary of all</span>
+<span class="sd">            values you want to save and populate for you drift scan</span>
+<span class="sd">            database.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            new_dict_entries (dict): set of new dictionary entries to store</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">,</span> <span class="o">**</span><span class="n">new_dict_entries</span><span class="p">}</span></div>
+
+<div class="viewcode-block" id="ScanParameters.info_dict"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.scan_parameters.ScanParameters.info_dict">[docs]</a>    <span class="k">def</span> <span class="nf">info_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Dictionary of parameters and their descriptions.&quot;&quot;&quot;</span>
+
+        <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;FILENAME&quot;</span><span class="p">:</span> <span class="s2">&quot;Name of fits file being processed&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;HDULENGTH&quot;</span><span class="p">:</span> <span class="s2">&quot;Length of fits file header data unit (HDU)&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;SOURCEDIR&quot;</span><span class="p">:</span> <span class="s2">&quot; Name of folder containing fits file&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;CURDATETIME&quot;</span><span class="p">:</span> <span class="s2">&quot;Date file was reduced&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;OBSDATE&quot;</span><span class="p">:</span> <span class="s2">&quot;Date of source observation, file creation date&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;OBSTIME&quot;</span><span class="p">:</span> <span class="s2">&quot;Time of source observation&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;MJD&quot;</span><span class="p">:</span> <span class="s2">&quot;Modified julian date of observation&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;OBJECT&quot;</span><span class="p">:</span> <span class="s2">&quot;Name of object observed&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;OBJECTTYPE&quot;</span><span class="p">:</span> <span class="s2">&quot;Object type i.e. calibrator or target&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;CENTFREQ&quot;</span><span class="p">:</span> <span class="s2">&quot;Central frequency&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;LOGFREQ&quot;</span><span class="p">:</span> <span class="s2">&quot;Log of central frequency&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;FOCUS&quot;</span><span class="p">:</span> <span class="s2">&quot;Sub-reflector focus&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;TILT&quot;</span><span class="p">:</span> <span class="s2">&quot;Sub-reflector tilt&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;HA&quot;</span><span class="p">:</span> <span class="s2">&quot;Hour angle&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;ZA&quot;</span><span class="p">:</span> <span class="s2">&quot;Zenith angle , used to be DEC&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;RADIOMETER&quot;</span><span class="p">:</span> <span class="s2">&quot;Radiometer type&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;BANDWDTH&quot;</span><span class="p">:</span> <span class="s2">&quot;Band width&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;TCAL1&quot;</span><span class="p">:</span> <span class="s2">&quot;Left circular polirization noise diode&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;TCAL2&quot;</span><span class="p">:</span> <span class="s2">&quot;Right circular polirization noise diode&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;NOMTSYS&quot;</span><span class="p">:</span> <span class="s2">&quot;Nominal system temperature&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;TSYS1&quot;</span><span class="p">:</span> <span class="s2">&quot;Left circular polirization system temperature&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;TSYSERR1&quot;</span><span class="p">:</span> <span class="s2">&quot;Error in Left circular polirization system temperature&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;TSYS2&quot;</span><span class="p">:</span> <span class="s2">&quot;Right circular polirization system temperature&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;TSYSERR2&quot;</span><span class="p">:</span> <span class="s2">&quot;Error in Right circular polirization system temperature&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;TAMBIENT&quot;</span><span class="p">:</span> <span class="s2">&quot;Ambient temperature [K]&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;PRESSURE&quot;</span><span class="p">:</span> <span class="s2">&quot;Atmospheric Pressure [mbar]&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;HUMIDITY&quot;</span><span class="p">:</span> <span class="s2">&quot;Humidity [%]&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;WINDSPD&quot;</span><span class="p">:</span> <span class="s2">&quot;Wind speed [m/s]&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;HPBW&quot;</span><span class="p">:</span> <span class="s2">&quot;Half power beam width&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;FNBW&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>     <span class="c1"># First null beam width</span>
+            <span class="s2">&quot;ELEVATION&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># Elevation</span>
+            <span class="s2">&quot;LONGITUDE&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># Longitude</span>
+            <span class="s2">&quot;LATITUDE&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># Latitude</span>
+            <span class="s2">&quot;SCANTYPE&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>  <span class="c1"># The scan type/mode</span>
+            <span class="s2">&quot;BEAMTYPE&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>  <span class="c1"># Beam type</span>
+            <span class="s2">&quot;OBSERVER&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>  <span class="c1"># Principal investigator</span>
+            <span class="s2">&quot;OBSLOCAL&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>  <span class="c1"># Local/on-site observer</span>
+            <span class="s2">&quot;PROJNAME&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>  <span class="c1"># Short name for project</span>
+            <span class="s2">&quot;PROPOSAL&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>  <span class="c1"># Observing Proposal ID</span>
+            <span class="s2">&quot;TELESCOPE&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>  <span class="c1"># Telescope name</span>
+            <span class="s2">&quot;UPGRADE&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>  <span class="c1"># INFO ON POSSIBLE UPGRSDES TO TELESCOPE</span>
+            <span class="s2">&quot;INSTFLAG&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># Radiometer flags</span>
+            <span class="s2">&quot;SCANDIST&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># Scan length (deg)</span>
+            <span class="s2">&quot;SCANTIME&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>  <span class="c1"># Scan time (s)</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">combine_parameters</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span></div>
+
+
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   COMMON SETTINGS</span>
+    <span class="c1"># =========================================================================</span>
+
+<div class="viewcode-block" id="ScanParameters.set_common_parameters"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.scan_parameters.ScanParameters.set_common_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">set_common_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Dictionary of default values for parameters common to all scan types.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;FILENAME&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>  <span class="c1"># Name of fits file being processed</span>
+            <span class="s2">&quot;HDULENGTH&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>  <span class="c1"># Length of fits file header data unit (HDU)</span>
+            <span class="s2">&quot;SOURCEDIR&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>  <span class="c1"># Name of folder containing fits file</span>
+            <span class="s2">&quot;CURDATETIME&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>  <span class="c1"># Date file was reduced</span>
+            <span class="s2">&quot;OBSDATE&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>  <span class="c1"># Date of source observation, file creation date</span>
+            <span class="s2">&quot;OBSTIME&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>  <span class="c1"># Time of source observation</span>
+            <span class="s2">&quot;MJD&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># Modified julian date of observation</span>
+            <span class="s2">&quot;OBJECT&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>  <span class="c1"># Name of object observed</span>
+            <span class="s2">&quot;OBJECTTYPE&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>  <span class="c1"># Object type i.e. calibrator or target</span>
+            <span class="s2">&quot;CENTFREQ&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># Central frequency</span>
+            <span class="s2">&quot;LOGFREQ&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># Log of central frequency</span>
+            <span class="s2">&quot;FOCUS&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># Sub-reflector focus</span>
+            <span class="s2">&quot;TILT&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>     <span class="c1"># Sub-reflector tilt</span>
+            <span class="s2">&quot;HA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>     <span class="c1"># Hour angle</span>
+            <span class="s2">&quot;ZA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>     <span class="c1"># Zenith angle , used to be DEC</span>
+            <span class="s2">&quot;RADIOMETER&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>  <span class="c1"># Radiometer type</span>
+            <span class="s2">&quot;BANDWDTH&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># Band width</span>
+            <span class="s2">&quot;TCAL1&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># Left circular polirization noise diode</span>
+            <span class="s2">&quot;TCAL2&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># Right circular polirization noise diode</span>
+            <span class="s2">&quot;NOMTSYS&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>   <span class="c1"># Nominal system temperature</span>
+            <span class="c1"># [K] Left circular polirization system temperature</span>
+            <span class="s2">&quot;TSYS1&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+            <span class="c1"># [K] Error in Left circular polirization system temperature</span>
+            <span class="s2">&quot;TSYSERR1&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+            <span class="c1"># [K] Right circular polirization system temperature</span>
+            <span class="s2">&quot;TSYS2&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+            <span class="c1"># [K] Error in Right circular polirization system temperature</span>
+            <span class="s2">&quot;TSYSERR2&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+            <span class="s2">&quot;TAMBIENT&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># Ambient temperature [K]</span>
+            <span class="s2">&quot;PRESSURE&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># Atmospheric Pressure [mbar]</span>
+            <span class="s2">&quot;HUMIDITY&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># Humidity [%]</span>
+            <span class="s2">&quot;WINDSPD&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># Wind speed [m/s]</span>
+            <span class="s2">&quot;HPBW&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># Half power beam width</span>
+            <span class="s2">&quot;FNBW&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>     <span class="c1"># First null beam width</span>
+            <span class="s2">&quot;ELEVATION&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># Elevation</span>
+            <span class="s2">&quot;LONGITUDE&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># Longitude</span>
+            <span class="s2">&quot;LATITUDE&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># Latitude</span>
+            <span class="s2">&quot;SCANTYPE&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>  <span class="c1"># The scan type/mode</span>
+            <span class="s2">&quot;BEAMTYPE&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>  <span class="c1"># Beam type</span>
+            <span class="s2">&quot;OBSERVER&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>  <span class="c1"># Principal investigator</span>
+            <span class="s2">&quot;OBSLOCAL&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>  <span class="c1"># Local/on-site observer</span>
+            <span class="s2">&quot;PROJNAME&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>  <span class="c1"># Short name for project</span>
+            <span class="s2">&quot;PROPOSAL&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>  <span class="c1"># Observing Proposal ID</span>
+            <span class="s2">&quot;TELESCOPE&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>  <span class="c1"># Telescope name</span>
+            <span class="s2">&quot;UPGRADE&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>  <span class="c1"># INFO ON POSSIBLE UPGRSDES TO TELESCOPE</span>
+            <span class="s2">&quot;INSTFLAG&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># Radiometer flags</span>
+            <span class="s2">&quot;SCANDIST&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># Scan length (deg)</span>
+            <span class="s2">&quot;SCANTIME&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>  <span class="c1"># Scan time (s)</span>
+        <span class="p">}</span></div>
+        <span class="c1">#self.combine_parameters(parameter)</span>
+
+<div class="viewcode-block" id="ScanParameters.set_flux_parameter"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.scan_parameters.ScanParameters.set_flux_parameter">[docs]</a>    <span class="k">def</span> <span class="nf">set_flux_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Set the flux. &quot;&quot;&quot;</span>
+
+        <span class="n">parameter</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;FLUX&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">combine_parameters</span><span class="p">(</span><span class="n">parameter</span><span class="p">)</span></div>
+
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   WIDE BEAM SCAN SETTINGS</span>
+    <span class="c1"># =========================================================================</span>
+
+<div class="viewcode-block" id="ScanParameters.set_atmosabs_parameter"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.scan_parameters.ScanParameters.set_atmosabs_parameter">[docs]</a>    <span class="k">def</span> <span class="nf">set_atmosabs_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Set the atmospheric absorption parameter. &quot;&quot;&quot;</span>
+
+        <span class="n">parameter</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;ATMOSABS&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">combine_parameters</span><span class="p">(</span><span class="n">parameter</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ScanParameters.set_onlcp_flag_parameter"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.scan_parameters.ScanParameters.set_onlcp_flag_parameter">[docs]</a>    <span class="k">def</span> <span class="nf">set_onlcp_flag_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Set the on scan lcp flag parameter. &quot;&quot;&quot;</span>
+
+        <span class="n">parameter</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;OLFLAG&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">combine_parameters</span><span class="p">(</span><span class="n">parameter</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ScanParameters.set_onrcp_flag_parameter"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.scan_parameters.ScanParameters.set_onrcp_flag_parameter">[docs]</a>    <span class="k">def</span> <span class="nf">set_onrcp_flag_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Set the on scan rcp flag parameter. &quot;&quot;&quot;</span>
+
+        <span class="n">parameter</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;ORFLAG&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">combine_parameters</span><span class="p">(</span><span class="n">parameter</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ScanParameters.set_wb_lcp_parameters"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.scan_parameters.ScanParameters.set_wb_lcp_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">set_wb_lcp_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Set the parameters specific to a wide beam on lcp drift scan. &quot;&quot;&quot;</span>
+
+        <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span>
+
+            <span class="s2">&quot;OLTA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>     <span class="c1"># On LCP antenna temperature</span>
+            <span class="s2">&quot;OLDTA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># Error in OLTA</span>
+            <span class="s2">&quot;OLS2N&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># On LCP signal to noise</span>
+            <span class="s2">&quot;OLTAPEAKLOC&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="c1"># On LCP peak fit location</span>
+            <span class="s2">&quot;OLRMSB&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>   <span class="c1"># RMS BEFORE SPLINE TO ALL DATA</span>
+            <span class="s2">&quot;OLRMSA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>   <span class="c1"># RMS AFTER SPLINE TO ALL DATA</span>
+            <span class="s2">&quot;OLBSLOPE&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># Slope of baseline fit</span>
+            <span class="s2">&quot;OLBSRMS&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>  <span class="c1"># Rms of baseline fit</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">combine_parameters</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ScanParameters.set_wb_lcp_pss_parameters"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.scan_parameters.ScanParameters.set_wb_lcp_pss_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">set_wb_lcp_pss_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Set the parameters specific to a wide beam scan on lcp pss. &quot;&quot;&quot;</span>
+
+        <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;OLPSS&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># On scan LCP point source sensitivity</span>
+            <span class="s2">&quot;OLDPSS&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># Error in OLPSS</span>
+            <span class="s2">&quot;OLAPPEFF&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>  <span class="c1"># On lcp apperture effeciency</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">combine_parameters</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ScanParameters.set_wb_rcp_parameters"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.scan_parameters.ScanParameters.set_wb_rcp_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">set_wb_rcp_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Set the parameter specific to a wide beam on rcp drift scan. &quot;&quot;&quot;</span>
+
+        <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span>
+
+            <span class="s2">&quot;ORTA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>     <span class="c1"># On RCP antenna temperature</span>
+            <span class="s2">&quot;ORDTA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># Error in ORTA</span>
+            <span class="s2">&quot;ORS2N&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># On RCP signal to noise ratio</span>
+            <span class="s2">&quot;ORTAPEAKLOC&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># On RCP peak fit location</span>
+            <span class="s2">&quot;ORRMSB&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>   <span class="c1"># RMS BEFORE SPLINE TO ALL DATA</span>
+            <span class="s2">&quot;ORRMSA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>   <span class="c1"># RMS AFTER SPLINE TO ALL DATA</span>
+            <span class="s2">&quot;ORBSLOPE&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># Slope of baseline fit</span>
+            <span class="s2">&quot;ORBSRMS&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>  <span class="c1"># Rms of baseline fit</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">combine_parameters</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ScanParameters.set_wb_rcp_pss_parameters"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.scan_parameters.ScanParameters.set_wb_rcp_pss_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">set_wb_rcp_pss_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Set the parameters specific to a wide beam on rcp pss. &quot;&quot;&quot;</span>
+
+        <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;ORPSS&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># On RCP point source sensitivity</span>
+            <span class="s2">&quot;ORDPSS&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># Error in ORPSS</span>
+            <span class="s2">&quot;ORAPPEFF&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>  <span class="c1"># On rcp apperture effeciency</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">combine_parameters</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ScanParameters.set_wb_cal_dict"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.scan_parameters.ScanParameters.set_wb_cal_dict">[docs]</a>    <span class="k">def</span> <span class="nf">set_wb_cal_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Combine wide beam common calibration parameters. &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_common_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_atmosabs_parameter</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_flux_parameter</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_wb_lcp_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_wb_lcp_pss_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_onlcp_flag_parameter</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_wb_rcp_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_wb_rcp_pss_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_onrcp_flag_parameter</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ScanParameters.set_wb_src_dict"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.scan_parameters.ScanParameters.set_wb_src_dict">[docs]</a>    <span class="k">def</span> <span class="nf">set_wb_src_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Combine wide beam common target parameters. &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_common_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_atmosabs_parameter</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_wb_lcp_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_onlcp_flag_parameter</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_wb_rcp_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_onrcp_flag_parameter</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ScanParameters.set_wb_cal_dict_no_comm"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.scan_parameters.ScanParameters.set_wb_cal_dict_no_comm">[docs]</a>    <span class="k">def</span> <span class="nf">set_wb_cal_dict_no_comm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Set calibration wide beam parameters without the common parameters.&quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_atmosabs_parameter</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_flux_parameter</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_wb_lcp_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_wb_lcp_pss_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_onlcp_flag_parameter</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_wb_rcp_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_wb_rcp_pss_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_onrcp_flag_parameter</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ScanParameters.set_wb_src_dict_no_comm"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.scan_parameters.ScanParameters.set_wb_src_dict_no_comm">[docs]</a>    <span class="k">def</span> <span class="nf">set_wb_src_dict_no_comm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Set target wide beam parameters without the common parameters.&quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_atmosabs_parameter</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_wb_lcp_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_onlcp_flag_parameter</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_wb_rcp_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_onrcp_flag_parameter</span><span class="p">()</span></div>
+
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   NARROW BEAM, 12 GHZ SCAN SETTINGS</span>
+    <span class="c1"># =========================================================================</span>
+
+<div class="viewcode-block" id="ScanParameters.set_nb_12ghz_tau_parameters"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.scan_parameters.ScanParameters.set_nb_12ghz_tau_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">set_nb_12ghz_tau_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Set Narrow beam 12 GHz tau (optical depth) parameters. &quot;&quot;&quot;</span>
+
+        <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;TAU10&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+            <span class="s2">&quot;TAU15&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">combine_parameters</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ScanParameters.set_nb_12ghz_tbatmos_parameters"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.scan_parameters.ScanParameters.set_nb_12ghz_tbatmos_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">set_nb_12ghz_tbatmos_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Set Narrow beam 12 GHz tbatmos (atmospheric temperature) parameters. &quot;&quot;&quot;</span>
+
+        <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;TBATMOS10&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+            <span class="s2">&quot;TBATMOS15&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">combine_parameters</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ScanParameters.set_comm_weather_parameters"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.scan_parameters.ScanParameters.set_comm_weather_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">set_comm_weather_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set Common weather parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># TODO: finalize descriptions</span>
+        <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;PWV&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># Precipitable water vapour</span>
+            <span class="s2">&quot;SVP&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># Saturated vapour pressure</span>
+            <span class="s2">&quot;AVP&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># Ambient vapour pressure</span>
+            <span class="s2">&quot;DPT&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># Dew point temperature</span>
+            <span class="s2">&quot;WVD&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>  <span class="c1"># Water vapor density</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">combine_parameters</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ScanParameters.set_nb_mean_atm"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.scan_parameters.ScanParameters.set_nb_mean_atm">[docs]</a>    <span class="k">def</span> <span class="nf">set_nb_mean_atm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set mean atmospheric correction parameter.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;MEAN_ATMOS_CORRECTION&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>  <span class="c1"># mean atmospheric correction</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">combine_parameters</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ScanParameters.set_nb_hpslcp_fit_parameters"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.scan_parameters.ScanParameters.set_nb_hpslcp_fit_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">set_nb_hpslcp_fit_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the parameters specific to a narrow beam hps lcp drift scan.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;SLTA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>      <span class="c1"># HPS LCP ANTENNA TEMPERATURE</span>
+            <span class="s2">&quot;SLDTA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>     <span class="c1"># ERROR IN SLTA</span>
+            <span class="s2">&quot;SLS2N&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>      <span class="c1"># HPS LCP SIGNAL TO NOISE RATIO</span>
+            <span class="s2">&quot;SLTAPEAKLOC&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># HPS LCP peak fit location</span>
+            <span class="s2">&quot;SLFLAG&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>     <span class="c1"># HPS LCP SCAN FLAG</span>
+            <span class="s2">&quot;SLRMSB&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># RMS BEFORE SPLINE TO ALL DATA</span>
+            <span class="s2">&quot;SLRMSA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># RMS AFTER SPLINE TO ALL DATA</span>
+            <span class="s2">&quot;SLBSLOPE&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># Slope of baseline fit</span>
+            <span class="s2">&quot;SLBSRMS&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>   <span class="c1"># Rms of baseline fit</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">combine_parameters</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ScanParameters.set_nb_hpnlcp_fit_parameters"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.scan_parameters.ScanParameters.set_nb_hpnlcp_fit_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">set_nb_hpnlcp_fit_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the parameters specific to a narrow beam hpn lcp drift scan.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;NLTA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>       <span class="c1"># HPN LCP ANTENNA TEMPERATURE</span>
+            <span class="s2">&quot;NLDTA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>      <span class="c1"># ERROR IN NLTA</span>
+            <span class="s2">&quot;NLS2N&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>      <span class="c1"># HPN LCP SIGNAL TO NOISE RATIO</span>
+            <span class="s2">&quot;NLTAPEAKLOC&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># HPN LCP peak fit location</span>
+            <span class="s2">&quot;NLFLAG&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>     <span class="c1"># HPN LCP SCAN FLAG</span>
+            <span class="s2">&quot;NLRMSB&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>     <span class="c1"># RMS BEFORE SPLINE TO ALL DATA</span>
+            <span class="s2">&quot;NLRMSA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>     <span class="c1"># RMS AFTER SPLINE TO ALL DATA</span>
+            <span class="s2">&quot;NLBSLOPE&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>   <span class="c1"># Slope of baseline fit</span>
+            <span class="s2">&quot;NLBSRMS&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>    <span class="c1"># Rms of baseline fit</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">combine_parameters</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ScanParameters.set_nb_onlcp_fit_parameters"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.scan_parameters.ScanParameters.set_nb_onlcp_fit_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">set_nb_onlcp_fit_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the parameters specific to a narrow beam on lcp drift scan.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;OLTA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>     <span class="c1"># On LCP antenna temperature</span>
+            <span class="s2">&quot;OLDTA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># Error in OLTA</span>
+            <span class="s2">&quot;OLPC&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>      <span class="c1"># On LCP pointing correction</span>
+            <span class="s2">&quot;COLTA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>     <span class="c1"># Corrected ON LCP antenna temp</span>
+            <span class="s2">&quot;COLDTA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>   <span class="c1"># Error in COLDTA</span>
+            <span class="s2">&quot;OLS2N&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># On LCP signal to noise</span>
+            <span class="s2">&quot;OLTAPEAKLOC&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># On LCP peak fit location</span>
+            <span class="s2">&quot;OLFLAG&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>   <span class="c1"># On LCP flag</span>
+            <span class="s2">&quot;OLRMSB&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>   <span class="c1"># RMS BEFORE SPLINE TO ALL DATA</span>
+            <span class="s2">&quot;OLRMSA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>   <span class="c1"># RMS AFTER SPLINE TO ALL DATA</span>
+            <span class="s2">&quot;OLBSLOPE&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># Slope of baseline fit</span>
+            <span class="s2">&quot;OLBSRMS&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>  <span class="c1"># Rms of baseline fit</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">combine_parameters</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ScanParameters.set_nb_hpsrcp_fit_parameters"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.scan_parameters.ScanParameters.set_nb_hpsrcp_fit_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">set_nb_hpsrcp_fit_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the parameters specific to a narrow beam hps rcp drift scan.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;SRTA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>     <span class="c1"># HPS RCP ANTENNA TEMPERATURE</span>
+            <span class="s2">&quot;SRDTA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># ERROR IN SRTA</span>
+            <span class="s2">&quot;SRS2N&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># HPS RCP SIGNAL TO NOISE RATIO</span>
+            <span class="s2">&quot;SRTAPEAKLOC&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># HPS RCP peak fit location</span>
+            <span class="s2">&quot;SRFLAG&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>   <span class="c1"># HPS RCP SCAN FLAG</span>
+            <span class="s2">&quot;SRRMSB&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>   <span class="c1"># RMS BEFORE SPLINE TO ALL DATA</span>
+            <span class="s2">&quot;SRRMSA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>   <span class="c1"># RMS AFTER SPLINE TO ALL DATA</span>
+            <span class="s2">&quot;SRBSLOPE&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># Slope of baseline fit</span>
+            <span class="s2">&quot;SRBSRMS&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>  <span class="c1"># Rms of baseline fit</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">combine_parameters</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ScanParameters.set_nb_hpnrcp_fit_parameters"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.scan_parameters.ScanParameters.set_nb_hpnrcp_fit_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">set_nb_hpnrcp_fit_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the parameters specific to a narrow beam hpn rcp drift scan.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;NRTA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>       <span class="c1"># HPN RCP ANTENNA TEMPERATURE</span>
+            <span class="s2">&quot;NRDTA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>      <span class="c1"># ERROR IN NRTA</span>
+            <span class="s2">&quot;NRS2N&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>      <span class="c1"># HPN RCP SIGNAL TO NOISE RATIO</span>
+            <span class="s2">&quot;NRTAPEAKLOC&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># HPN RCP peak fit location</span>
+            <span class="s2">&quot;NRFLAG&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>     <span class="c1"># HPS RCP SCAN FLAG</span>
+            <span class="s2">&quot;NRRMSB&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>     <span class="c1"># RMS BEFORE SPLINE TO ALL DATA</span>
+            <span class="s2">&quot;NRRMSA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>     <span class="c1"># RMS AFTER SPLINE TO ALL DATA</span>
+            <span class="s2">&quot;NRBSLOPE&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>   <span class="c1"># Slope of baseline fit</span>
+            <span class="s2">&quot;NRBSRMS&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>    <span class="c1"># Rms of baseline fit</span>
+        <span class="p">}</span>
+        <span class="c1">#print(parameters)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">combine_parameters</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ScanParameters.set_nb_onrcp_fit_parameters"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.scan_parameters.ScanParameters.set_nb_onrcp_fit_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">set_nb_onrcp_fit_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the parameters specific to a narrow beam on lcp drift scan.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;ORTA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>     <span class="c1"># On RCP antenna temperature</span>
+            <span class="s2">&quot;ORDTA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># Error in ORTA</span>
+            <span class="s2">&quot;ORPC&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>     <span class="c1"># ON RCP pointing correction</span>
+            <span class="s2">&quot;CORTA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># Corrected ON RCP antenna temp</span>
+            <span class="s2">&quot;CORDTA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>   <span class="c1"># Error in CORDTA</span>
+            <span class="s2">&quot;ORS2N&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># On RCP signal to noise</span>
+            <span class="s2">&quot;ORTAPEAKLOC&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># On RCP peak fit location</span>
+            <span class="s2">&quot;ORFLAG&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>   <span class="c1"># On RCP flag</span>
+            <span class="s2">&quot;ORRMSB&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>   <span class="c1"># RMS BEFORE SPLINE TO ALL DATA</span>
+            <span class="s2">&quot;ORRMSA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>   <span class="c1"># RMS AFTER SPLINE TO ALL DATA</span>
+            <span class="s2">&quot;ORBSLOPE&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># Slope of baseline fit</span>
+            <span class="s2">&quot;ORBSRMS&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>  <span class="c1"># Rms of baseline fit</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">combine_parameters</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ScanParameters.set_nb_onlcp_pss_parameters"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.scan_parameters.ScanParameters.set_nb_onlcp_pss_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">set_nb_onlcp_pss_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the parameters specific to a narrow beam scan on lcp pss.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;OLPSS&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># On LCP point source sensitivity</span>
+            <span class="s2">&quot;OLDPSS&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>   <span class="c1"># Error in OLPSS</span>
+            <span class="s2">&quot;OLAPPEFF&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># On lcp apperture effeciency</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">combine_parameters</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ScanParameters.set_nb_onrcp_pss_parameters"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.scan_parameters.ScanParameters.set_nb_onrcp_pss_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">set_nb_onrcp_pss_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the parameters specific to a narrow beam scan on rcp pss.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;ORPSS&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># On RCP point source sensitivity</span>
+            <span class="s2">&quot;ORDPSS&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># Error in ORPSS</span>
+            <span class="s2">&quot;ORAPPEFF&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>  <span class="c1"># On rcp apperture effeciency</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">combine_parameters</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ScanParameters.set_nb_cal_dict"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.scan_parameters.ScanParameters.set_nb_cal_dict">[docs]</a>    <span class="k">def</span> <span class="nf">set_nb_cal_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Set Narrow beam calibration data dictionary.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_common_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_flux_parameter</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_comm_weather_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_mean_atm</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_12ghz_tau_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_12ghz_tbatmos_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_hpslcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_hpnlcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_onlcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_onlcp_pss_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_hpsrcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_hpnrcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_onrcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_onrcp_pss_parameters</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ScanParameters.set_nb_cal_dict_no_comm"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.scan_parameters.ScanParameters.set_nb_cal_dict_no_comm">[docs]</a>    <span class="k">def</span> <span class="nf">set_nb_cal_dict_no_comm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set Narrow beam calibration data dictionary without common parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_flux_parameter</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_comm_weather_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_mean_atm</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_12ghz_tau_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_12ghz_tbatmos_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_hpslcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_hpnlcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_onlcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_onlcp_pss_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_hpsrcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_hpnrcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_onrcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_onrcp_pss_parameters</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ScanParameters.set_nb_src_dict"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.scan_parameters.ScanParameters.set_nb_src_dict">[docs]</a>    <span class="k">def</span> <span class="nf">set_nb_src_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">           Set Narrow beam target data dictionary.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_common_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_comm_weather_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_mean_atm</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_12ghz_tau_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_12ghz_tbatmos_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_hpslcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_hpnlcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_onlcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_hpsrcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_hpnrcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_onrcp_fit_parameters</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ScanParameters.set_nb_src_dict_no_comm"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.scan_parameters.ScanParameters.set_nb_src_dict_no_comm">[docs]</a>    <span class="k">def</span> <span class="nf">set_nb_src_dict_no_comm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Set Narrow beam target data dictionary without common parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_flux_parameter</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_comm_weather_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_mean_atm</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_12ghz_tau_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_12ghz_tbatmos_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_hpslcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_hpnlcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_onlcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_hpsrcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_hpnrcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_onrcp_fit_parameters</span><span class="p">()</span></div>
+
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   JUPITER SETTINGS</span>
+    <span class="c1"># =========================================================================</span>
+
+<div class="viewcode-block" id="ScanParameters.set_nb_22ghz_tau_parameters"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.scan_parameters.ScanParameters.set_nb_22ghz_tau_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">set_nb_22ghz_tau_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set Narrow beam 22 GHz tau (optical depth) parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;TAU221&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+            <span class="s2">&quot;TAU2223&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">combine_parameters</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ScanParameters.set_nb_22ghz_tbatmos_parameters"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.scan_parameters.ScanParameters.set_nb_22ghz_tbatmos_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">set_nb_22ghz_tbatmos_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set Narrow beam 22 GHz tbatmos (atmospheric temperature) parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;TBATMOS221&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+            <span class="s2">&quot;TBATMOS2223&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">combine_parameters</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ScanParameters.set_jupiter_parameters"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.scan_parameters.ScanParameters.set_jupiter_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">set_jupiter_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Set Jupiter specific calibration parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;HPBW_ARCSEC&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>           <span class="c1"># half power beam width in arcseconds</span>
+            <span class="s2">&quot;ADOPTED_PLANET_TB&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>           <span class="c1"># adopted planet temperature brightness</span>
+            <span class="s2">&quot;PLANET_ANG_DIAM&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>           <span class="c1"># planet angular diameter</span>
+            <span class="s2">&quot;JUPITER_DIST_AU&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>           <span class="c1"># jupiter distance in astronomical units</span>
+            <span class="s2">&quot;SYNCH_FLUX_DENSITY&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>           <span class="c1"># synchrotron flux density</span>
+            <span class="s2">&quot;PLANET_ANG_EQ_RAD&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>           <span class="c1"># planet angular equatorial radius</span>
+            <span class="s2">&quot;PLANET_SOLID_ANG&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>           <span class="c1"># planet solid angle in steradians</span>
+            <span class="s2">&quot;THERMAL_PLANET_FLUX_D&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>           <span class="c1"># thermal planet flux density</span>
+            <span class="s2">&quot;TOTAL_PLANET_FLUX_D&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>           <span class="c1"># total planet flux density</span>
+            <span class="s2">&quot;TOTAL_PLANET_FLUX_D_WMAP&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>   <span class="c1"># total planet flux density from WMAP</span>
+            <span class="s2">&quot;SIZE_FACTOR_IN_BEAM&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>           <span class="c1"># size factor in beam</span>
+            <span class="s2">&quot;SIZE_CORRECTION_FACTOR&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>           <span class="c1"># size correction factor</span>
+            <span class="s2">&quot;MEASURED_TCAL1&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>           <span class="c1"># measured noise diode temp in lcp</span>
+            <span class="s2">&quot;MEASURED_TCAL2&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>           <span class="c1"># measured noise diode temp in rcp</span>
+            <span class="c1"># measured noise diode temp correction factor in lcp</span>
+            <span class="s2">&quot;MEAS_TCAL1_CORR_FACTOR&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+            <span class="c1"># measured noise diode temp correction factor in rcp</span>
+            <span class="s2">&quot;MEAS_TCAL2_CORR_FACTOR&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+            <span class="s2">&quot;ATMOS_ABSORPTION_CORR&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>           <span class="c1"># atmospheric absorption correction</span>
+            <span class="s2">&quot;ZA_RAD&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>            <span class="c1"># zenith angle in radians</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">combine_parameters</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ScanParameters.set_jupiter_dict"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.scan_parameters.ScanParameters.set_jupiter_dict">[docs]</a>    <span class="k">def</span> <span class="nf">set_jupiter_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set jupiter calibration data dictionary.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_common_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_comm_weather_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_jupiter_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_22ghz_tau_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_22ghz_tbatmos_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_hpslcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_hpnlcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_onlcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_onlcp_pss_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_hpsrcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_hpnrcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_onrcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_onrcp_pss_parameters</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ScanParameters.set_jupiter_dict_no_comm"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.scan_parameters.ScanParameters.set_jupiter_dict_no_comm">[docs]</a>    <span class="k">def</span> <span class="nf">set_jupiter_dict_no_comm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set jupiter calibration data dictionary without common parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_comm_weather_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_jupiter_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_22ghz_tau_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_22ghz_tbatmos_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_hpslcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_hpnlcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_onlcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_onlcp_pss_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_hpsrcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_hpnrcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_onrcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_onrcp_pss_parameters</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ScanParameters.set_nb_22ghz_src_dict"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.scan_parameters.ScanParameters.set_nb_22ghz_src_dict">[docs]</a>    <span class="k">def</span> <span class="nf">set_nb_22ghz_src_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set narrow beam 22 GHz target data dictionary.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_common_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_comm_weather_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_22ghz_tau_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_22ghz_tbatmos_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_hpslcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_hpnlcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_onlcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_hpsrcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_hpnrcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_onrcp_fit_parameters</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ScanParameters.set_nb_22ghz_src_dict_no_comm"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.scan_parameters.ScanParameters.set_nb_22ghz_src_dict_no_comm">[docs]</a>    <span class="k">def</span> <span class="nf">set_nb_22ghz_src_dict_no_comm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set narrow beam 22 GHz target data dictionary without common parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_comm_weather_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_22ghz_tau_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_22ghz_tbatmos_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_hpslcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_hpnlcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_onlcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_hpsrcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_hpnrcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_onrcp_fit_parameters</span><span class="p">()</span></div>
+
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   DUAL BEAM SETTINGS</span>
+    <span class="c1"># =========================================================================</span>
+
+<div class="viewcode-block" id="ScanParameters.set_db_hpslcp_fit_parameters"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.scan_parameters.ScanParameters.set_db_hpslcp_fit_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">set_db_hpslcp_fit_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set dual beam hps lcp parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;ASLTA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>     <span class="c1"># A BEAM HPS LCP ANTENNA TEMPERATURE</span>
+            <span class="s2">&quot;ASLDTA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># A BEAM HPS LCP ERROR IN ANTENNA TEMPERATURE</span>
+            <span class="s2">&quot;ASLS2N&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># A BEAM HPS LCP SIGNAL TO NOISE RATIO</span>
+            <span class="s2">&quot;ASLTAPEAKLOC&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># A BEAM HPS LCP peak fit location</span>
+            <span class="s2">&quot;BSLTA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>     <span class="c1"># B BEAM HPS LCP ANTENNA TEMPERATURE</span>
+            <span class="s2">&quot;BSLDTA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># B BEAM HPS LCP ERROR IN ANTENNA TEMPERATURE</span>
+            <span class="s2">&quot;BSLS2N&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># B BEAM HPS LCP SIGNAL TO NOISE RATIO</span>
+            <span class="s2">&quot;BSLTAPEAKLOC&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># B BEAM HPS LCP peak fit location</span>
+            <span class="s2">&quot;SLFLAG&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># HPS LCP SCAN FLAG</span>
+            <span class="s2">&quot;SLRMSB&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># RMS BEFORE SPLINE TO ALL DATA</span>
+            <span class="s2">&quot;SLRMSA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># RMS AFTER SPLINE TO ALL DATA</span>
+            <span class="s2">&quot;SLBSLOPE&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># Slope of baseline fit</span>
+            <span class="s2">&quot;SLBSRMS&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>   <span class="c1"># Rms of baseline fit</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">combine_parameters</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ScanParameters.set_db_hpnlcp_fit_parameters"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.scan_parameters.ScanParameters.set_db_hpnlcp_fit_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">set_db_hpnlcp_fit_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set dual beam hpn lcp parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;ANLTA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>     <span class="c1"># A BEAM HPN LCP ANTENNA TEMPERATURE</span>
+            <span class="s2">&quot;ANLDTA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># A BEAM HPN LCP ERROR IN ANTENNA TEMPERATURE</span>
+            <span class="s2">&quot;ANLS2N&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># A BEAM HPN LCP SIGNAL TO NOISE RATIO</span>
+            <span class="s2">&quot;ANLTAPEAKLOC&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># A BEAM HPN LCP peak fit location</span>
+            <span class="s2">&quot;BNLTA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>     <span class="c1"># B BEAM HPN LCP ANTENNA TEMPERATURE</span>
+            <span class="s2">&quot;BNLDTA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># B BEAM HPN LCP ERROR IN ANTENNA TEMPERATURE</span>
+            <span class="s2">&quot;BNLS2N&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># B BEAM HPN LCP SIGNAL TO NOISE RATIO</span>
+            <span class="s2">&quot;BNLTAPEAKLOC&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># A BEAM HPN LCP peak fit location</span>
+            <span class="s2">&quot;NLFLAG&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># HPN LCP SCAN FLAG</span>
+            <span class="s2">&quot;NLRMSB&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># RMS BEFORE SPLINE TO ALL DATA</span>
+            <span class="s2">&quot;NLRMSA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># RMS AFTER SPLINE TO ALL DATA</span>
+            <span class="s2">&quot;NLBSLOPE&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># HPN LCP Slope of baseline fit</span>
+            <span class="s2">&quot;NLBSRMS&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>   <span class="c1"># HPN LCP Rms of baseline fit</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">combine_parameters</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ScanParameters.set_db_onlcp_fit_parameters"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.scan_parameters.ScanParameters.set_db_onlcp_fit_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">set_db_onlcp_fit_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set dual beam on lcp parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;AOLTA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>     <span class="c1"># A BEAM On LCP antenna temperature</span>
+            <span class="s2">&quot;AOLDTA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># A BEAM Error in OLTA</span>
+            <span class="s2">&quot;AOLPC&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>      <span class="c1"># A BEAM ON LCP POINTING CORRECTION</span>
+            <span class="s2">&quot;ACOLTA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>     <span class="c1"># A BEAM Corrected ON LCP antenna temp</span>
+            <span class="s2">&quot;ACOLDTA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>   <span class="c1"># A BEAM ERROR IN CORRECTED ON LCP ANTENNA TEMPERATURE</span>
+            <span class="s2">&quot;AOLS2N&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># A BEAM On LCP signal to noise</span>
+            <span class="s2">&quot;AOLTAPEAKLOC&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># A BEAM ON LCP peak fit location</span>
+            <span class="s2">&quot;BOLTA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>     <span class="c1"># B BEAM On LCP antenna temperature</span>
+            <span class="s2">&quot;BOLDTA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># B BEAM Error in OLTA</span>
+            <span class="s2">&quot;BOLPC&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>     <span class="c1"># B BEAM ON LCP POINTING CORRECTION</span>
+            <span class="s2">&quot;BCOLTA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># B BEAM Corrected ON LCP antenna temp</span>
+            <span class="s2">&quot;BCOLDTA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>   <span class="c1"># B BEAM ERROR IN CORRECTED ON LCP ANTENNA TEMPERATURE</span>
+            <span class="s2">&quot;BOLS2N&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># B BEAM On LCP signal to noise RATIO</span>
+            <span class="s2">&quot;BOLTAPEAKLOC&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># B BEAM ON LCP peak fit location</span>
+            <span class="s2">&quot;OLFLAG&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># On LCP flag</span>
+            <span class="s2">&quot;OLRMSB&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># RMS BEFORE SPLINE TO ALL DATA</span>
+            <span class="s2">&quot;OLRMSA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># RMS AFTER SPLINE TO ALL DATA</span>
+            <span class="s2">&quot;OLBSLOPE&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># Slope of baseline fit</span>
+            <span class="s2">&quot;OLBSRMS&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>   <span class="c1"># Rms of baseline fit</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">combine_parameters</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ScanParameters.set_db_hpsrcp_fit_parameters"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.scan_parameters.ScanParameters.set_db_hpsrcp_fit_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">set_db_hpsrcp_fit_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set dual beam hps rcp parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;ASRTA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>     <span class="c1"># A BEAM HPS RCP ANTENNA TEMPERATURE</span>
+            <span class="s2">&quot;ASRDTA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># A BEAM HPS RCP ERROR IN ANTENNA TEMPERATURE</span>
+            <span class="s2">&quot;ASRS2N&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># A BEAM HPS RCP SIGNAL TO NOISE RATIO</span>
+            <span class="s2">&quot;ASRTAPEAKLOC&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># A BEAM HPS RCP peak fit location</span>
+            <span class="s2">&quot;BSRTA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>     <span class="c1"># B BEAM HPS RCP ANTENNA TEMPERATURE</span>
+            <span class="s2">&quot;BSRDTA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># B BEAM HPS RCP ERROR IN ANTENNA TEMPERATURE</span>
+            <span class="s2">&quot;BSRS2N&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># B BEAM HPS RCP SIGNAL TO NOISE RATIO</span>
+            <span class="s2">&quot;BSRTAPEAKLOC&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># B BEAM HPS RCP peak fit location</span>
+            <span class="s2">&quot;SRFLAG&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># HPS RCP SCAN FLAG</span>
+            <span class="s2">&quot;SRRMSB&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># RMS BEFORE SPLINE TO ALL DATA</span>
+            <span class="s2">&quot;SRRMSA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># RMS AFTER SPLINE TO ALL DATA</span>
+            <span class="s2">&quot;SRBSLOPE&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># Slope of baseline fit</span>
+            <span class="s2">&quot;SRBSRMS&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>   <span class="c1"># Rms of baseline fit</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">combine_parameters</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ScanParameters.set_db_hpnrcp_fit_parameters"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.scan_parameters.ScanParameters.set_db_hpnrcp_fit_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">set_db_hpnrcp_fit_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set dual beam hpn rcp parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;ANRTA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>     <span class="c1"># A BEAM HPN RCP ANTENNA TEMPERATURE</span>
+            <span class="s2">&quot;ANRDTA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># A BEAM HPN RCP ERROR IN ANTENNA TEMPERATURE</span>
+            <span class="s2">&quot;ANRS2N&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># A BEAM HPN RCP SIGNAL TO NOISE RATIO</span>
+            <span class="s2">&quot;ANRTAPEAKLOC&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># A BEAM HPN RCP peak fit location</span>
+            <span class="s2">&quot;BNRTA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>     <span class="c1"># B BEAM HPN RCP ANTENNA TEMPERATURE</span>
+            <span class="s2">&quot;BNRDTA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># B BEAM HPN RCP ERROR IN ANTENNA TEMPERATURE</span>
+            <span class="s2">&quot;BNRS2N&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># B BEAM HPN RCP SIGNAL TO NOISE RATIO</span>
+            <span class="s2">&quot;BNRTAPEAKLOC&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># B BEAM HPN RCP peak fit location</span>
+            <span class="s2">&quot;NRFLAG&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># HPS RCP SCAN FLAG</span>
+            <span class="s2">&quot;NRRMSB&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># RMS BEFORE SPLINE TO ALL DATA</span>
+            <span class="s2">&quot;NRRMSA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># RMS AFTER SPLINE TO ALL DATA</span>
+            <span class="s2">&quot;NRBSLOPE&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># Slope of baseline fit</span>
+            <span class="s2">&quot;NRBSRMS&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>   <span class="c1"># Rms of baseline fit</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">combine_parameters</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ScanParameters.set_db_onrcp_fit_parameters"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.scan_parameters.ScanParameters.set_db_onrcp_fit_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">set_db_onrcp_fit_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set dual beam on rcp parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;AORTA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>     <span class="c1"># A BEAM On RCP antenna temperature</span>
+            <span class="s2">&quot;AORDTA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># A BEAM Error in ORTA</span>
+            <span class="s2">&quot;AORPC&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>     <span class="c1"># A BEAM ON RCP POINTING CORRECTION</span>
+            <span class="s2">&quot;ACORTA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># A BEAM Corrected ON RCP antenna tempERATURE</span>
+            <span class="s2">&quot;ACORDTA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>   <span class="c1"># A BEAM ERROR IN CORRECTED ON RCP ANTENNA TEMPERATURE</span>
+            <span class="s2">&quot;AORS2N&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># A BEAM On RCP signal to noise RATIO</span>
+            <span class="s2">&quot;AORTAPEAKLOC&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># A BEAM ON RCP peak fit location</span>
+            <span class="s2">&quot;BORTA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>     <span class="c1"># B BEAM On RCP antenna temperature</span>
+            <span class="s2">&quot;BORDTA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># B BEAM Error in ORTA</span>
+            <span class="s2">&quot;BORPC&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>     <span class="c1"># B BEAM ON RCP POINTING CORRECTION</span>
+            <span class="s2">&quot;BCORTA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># B BEAM Corrected ON RCP antenna temp</span>
+            <span class="s2">&quot;BCORDTA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>   <span class="c1"># B BEAM ERROR IN CORRECTED ON RCP ANTENNA TEMPERATURE</span>
+            <span class="s2">&quot;BORS2N&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># B BEAM On RCP signal to noise</span>
+            <span class="s2">&quot;BORTAPEAKLOC&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># B BEAM ON RCP peak fit location</span>
+            <span class="s2">&quot;ORFLAG&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># On RCP flag</span>
+            <span class="s2">&quot;ORRMSB&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># RMS BEFORE SPLINE TO ALL DATA</span>
+            <span class="s2">&quot;ORRMSA&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># RMS AFTER SPLINE TO ALL DATA</span>
+            <span class="s2">&quot;ORBSLOPE&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># Slope of baseline fit</span>
+            <span class="s2">&quot;ORBSRMS&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>   <span class="c1"># Rms of baseline fit</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">combine_parameters</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ScanParameters.set_db_onlcp_pss_parameters"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.scan_parameters.ScanParameters.set_db_onlcp_pss_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">set_db_onlcp_pss_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set dual beam on lcp pss parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;AOLPSS&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># A BEAM On LCP point source sensitivity</span>
+            <span class="s2">&quot;AOLDPSS&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>   <span class="c1"># A BEAM Error in OLPSS</span>
+            <span class="s2">&quot;AOLAPPEFF&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># A Beam On lcp apperture effeciency</span>
+            <span class="s2">&quot;BOLPSS&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># B BEAM On LCP point source sensitivity</span>
+            <span class="s2">&quot;BOLDPSS&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>   <span class="c1"># B BEAM Error in OLPSS</span>
+            <span class="s2">&quot;BOLAPPEFF&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>  <span class="c1"># B Beam On lcp apperture effeciency</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">combine_parameters</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ScanParameters.set_db_onrcp_pss_parameters"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.scan_parameters.ScanParameters.set_db_onrcp_pss_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">set_db_onrcp_pss_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set dual beam on rcp pss parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;AORPSS&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># A BEAM On RCP point source sensitivity</span>
+            <span class="s2">&quot;AORDPSS&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>   <span class="c1"># A BEAM Error in ORPSS</span>
+            <span class="s2">&quot;AORAPPEFF&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># A Beam On rcp apperture effeciency</span>
+            <span class="s2">&quot;BORPSS&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># B BEAM On RCP point source sensitivity</span>
+            <span class="s2">&quot;BORDPSS&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>    <span class="c1"># B BEAM Error in ORPSS</span>
+            <span class="s2">&quot;BORAPPEFF&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>  <span class="c1"># B Beam On rcp apperture effeciency</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">combine_parameters</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ScanParameters.set_db_weather_parameters"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.scan_parameters.ScanParameters.set_db_weather_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">set_db_weather_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set dual beam weather related parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># TODO: complete descriptions</span>
+        <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;SEC_Z&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># secant of zenith</span>
+            <span class="s2">&quot;X_Z&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+            <span class="s2">&quot;DRY_ATMOS_TRANSMISSION&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>  <span class="c1"># dry atmospheric transmission</span>
+            <span class="c1"># zenith tau (optical depth) at 1400m</span>
+            <span class="s2">&quot;ZENITH_TAU_AT_1400M&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+            <span class="s2">&quot;ABSORPTION_AT_ZENITH&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>  <span class="c1"># absorption at zenith</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">combine_parameters</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ScanParameters.set_db_cal_dict"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.scan_parameters.ScanParameters.set_db_cal_dict">[docs]</a>    <span class="k">def</span> <span class="nf">set_db_cal_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set dual beam calibrator parameters</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_common_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_flux_parameter</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_comm_weather_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_db_weather_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_db_hpslcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_db_hpnlcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_db_onlcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_db_onlcp_pss_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_onlcp_flag_parameter</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_db_hpsrcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_db_hpnrcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_db_onrcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_db_onrcp_pss_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_onrcp_flag_parameter</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ScanParameters.set_db_cal_dict_no_comm"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.scan_parameters.ScanParameters.set_db_cal_dict_no_comm">[docs]</a>    <span class="k">def</span> <span class="nf">set_db_cal_dict_no_comm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set dual beam calibrator parameters</span>
+<span class="sd">        without the common settings.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_flux_parameter</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_comm_weather_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_db_weather_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_db_hpslcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_db_hpnlcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_db_onlcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_db_onlcp_pss_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_onlcp_flag_parameter</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_db_hpsrcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_db_hpnrcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_db_onrcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_db_onrcp_pss_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_onrcp_flag_parameter</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ScanParameters.set_db_src_dict"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.scan_parameters.ScanParameters.set_db_src_dict">[docs]</a>    <span class="k">def</span> <span class="nf">set_db_src_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set dual beam target source parameters</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_common_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_comm_weather_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_db_weather_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_db_hpslcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_db_hpnlcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_db_onlcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_onlcp_flag_parameter</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_db_hpsrcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_db_hpnrcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_db_onrcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_onrcp_flag_parameter</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ScanParameters.set_db_src_dict_no_comm"><a class="viewcode-back" href="../../../docs/src.common.html#src.common.scan_parameters.ScanParameters.set_db_src_dict_no_comm">[docs]</a>    <span class="k">def</span> <span class="nf">set_db_src_dict_no_comm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set dual beam target parameters</span>
+<span class="sd">        without the common settings.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_comm_weather_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_db_weather_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_db_hpslcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_db_hpnlcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_db_onlcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_onlcp_flag_parameter</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_db_hpsrcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_db_hpnrcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_db_onrcp_fit_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_onrcp_flag_parameter</span><span class="p">()</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">dran v1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">src.common.scan_parameters</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2023, Pfesi van Zyl.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
+    </div>
+  </body>
+</html>
