@@ -62,6 +62,7 @@ Also please read through the :doc:`extras/caveats` to keep updated
 on the program limitations and assumptions made before beginning any analysis.
 
 .. toctree::
+   :hidden:
    :maxdepth: 2
    :caption: Contents:
 
@@ -80,6 +81,7 @@ on the program limitations and assumptions made before beginning any analysis.
    changelog.rst
 
 .. toctree::
+   :hidden:
    :maxdepth: 2
    :caption: Tutorials:
 
