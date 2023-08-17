@@ -88,7 +88,8 @@ on the program limitations and assumptions made before beginning any analysis.
    extras/tuts/tutorials.rst
 
    extras/commands.rst
-   
+
+   changelog.rst
 
 ..   docs/modules.rst
 
