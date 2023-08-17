@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021) (preloaded format=pdflatex 2021.4.27)  16 AUG 2023 13:12
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021) (preloaded format=pdflatex 2021.4.27)  17 AUG 2023 08:43
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -898,70 +898,70 @@ _data/HydraA_13NB/2014d047_20h30m12s_Cont_mike_HYDRA_A.fits
  []
 
 [10] [11] [12] [13]
-<landing.png, id=207, 634.37pt x 418.56375pt>
+<landing.png, id=216, 634.37pt x 418.56375pt>
 File: landing.png Graphic file (type png)
 <use landing.png>
 Package pdftex.def Info: landing.png  used on input line 850.
 (pdftex.def)             Requested size: 469.76523pt x 309.94307pt.
  [14 <./landing.png>]
-<home.png, id=214, 1283.79625pt x 777.90625pt>
+<home.png, id=223, 1283.79625pt x 777.90625pt>
 File: home.png Graphic file (type png)
 <use home.png>
 Package pdftex.def Info: home.png  used on input line 867.
 (pdftex.def)             Requested size: 469.7473pt x 284.65155pt.
-<loaded_scan.png, id=215, 1282.7925pt x 771.88374pt>
+<loaded_scan.png, id=224, 1282.7925pt x 771.88374pt>
 File: loaded_scan.png Graphic file (type png)
 <use loaded_scan.png>
 Package pdftex.def Info: loaded_scan.png  used on input line 876.
 (pdftex.def)             Requested size: 469.75192pt x 282.65979pt.
  [15 <./home.png>]
-<base_select.png, id=222, 1282.7925pt x 779.91376pt>
+<base_select.png, id=231, 1282.7925pt x 779.91376pt>
 File: base_select.png Graphic file (type png)
 <use base_select.png>
 Package pdftex.def Info: base_select.png  used on input line 882.
 (pdftex.def)             Requested size: 469.75192pt x 285.60034pt.
  [16 <./loaded_scan.png> <./base_select.png>]
-<base_corrected.png, id=229, 1284.8pt x 779.91376pt>
+<base_corrected.png, id=238, 1284.8pt x 779.91376pt>
 File: base_corrected.png Graphic file (type png)
 <use base_corrected.png>
 Package pdftex.def Info: base_corrected.png  used on input line 892.
 (pdftex.def)             Requested size: 469.74208pt x 285.14813pt.
-<peak_select.png, id=230, 1281.78876pt x 777.90625pt>
+<peak_select.png, id=239, 1281.78876pt x 777.90625pt>
 File: peak_select.png Graphic file (type png)
 <use peak_select.png>
 Package pdftex.def Info: peak_select.png  used on input line 904.
 (pdftex.def)             Requested size: 469.75597pt x 285.09073pt.
  [17 <./base_corrected.png>]
-<peak_fit.png, id=236, 1284.8pt x 778.91pt>
+<peak_fit.png, id=245, 1284.8pt x 778.91pt>
 File: peak_fit.png Graphic file (type png)
 <use peak_fit.png>
 Package pdftex.def Info: peak_fit.png  used on input line 912.
 (pdftex.def)             Requested size: 469.74208pt x 284.78114pt.
  [18 <./peak_select.png> <./peak_fit.png>]
-<db_save.png, id=243, 1281.78876pt x 790.955pt>
+<db_save.png, id=252, 1281.78876pt x 790.955pt>
 File: db_save.png Graphic file (type png)
 <use db_save.png>
 Package pdftex.def Info: db_save.png  used on input line 934.
 (pdftex.def)             Requested size: 469.75597pt x 289.87291pt.
-<db.png, id=244, 796.9775pt x 750.805pt>
+<db.png, id=253, 796.9775pt x 750.805pt>
 File: db.png Graphic file (type png)
 <use db.png>
 Package pdftex.def Info: db.png  used on input line 949.
 (pdftex.def)             Requested size: 469.75053pt x 442.54723pt.
  [19 <./db_save.png>]
-<insert.png, id=250, 1383.1675pt x 753.81625pt>
+<insert.png, id=259, 1383.1675pt x 753.81625pt>
 File: insert.png Graphic file (type png)
 <use insert.png>
 Package pdftex.def Info: insert.png  used on input line 956.
 (pdftex.def)             Requested size: 469.74309pt x 256.00658pt.
  [20 <./db.png>]
-<plot_views.png, id=256, 397.485pt x 339.2675pt>
+<plot_views.png, id=265, 397.485pt x 339.2675pt>
 File: plot_views.png Graphic file (type png)
 <use plot_views.png>
 Package pdftex.def Info: plot_views.png  used on input line 970.
 (pdftex.def)             Requested size: 397.48402pt x 339.26666pt.
  [21 <./insert.png>]
-<plots.png, id=263, 1383.1675pt x 779.91376pt>
+<plots.png, id=272, 1383.1675pt x 779.91376pt>
 File: plots.png Graphic file (type png)
 <use plots.png>
 Package pdftex.def Info: plots.png  used on input line 977.
@@ -969,13 +969,13 @@ Package pdftex.def Info: plots.png  used on input line 977.
 
 [22 <./plot_views.png> <./plots.png>] [23] [24] (./dran.ind) [25] (./dran.aux)
 Package rerunfilecheck Info: File `dran.out' has not changed.
-(rerunfilecheck)             Checksum: EA6B43F1FEBBA6C77A72AECDA37EEB50;3671.
+(rerunfilecheck)             Checksum: 743B187F5597AB50712FC8EC05BDF98C;3935.
  ) 
 Here is how much of TeX's memory you used:
- 14997 strings out of 478994
- 231785 string characters out of 5858184
- 706167 words of memory out of 5000000
- 32024 multiletter control sequences out of 15000+600000
+ 15004 strings out of 478994
+ 231925 string characters out of 5858184
+ 706313 words of memory out of 5000000
+ 32029 multiletter control sequences out of 15000+600000
  460707 words of font info for 71 fonts, out of 8000000 for 9000
  1142 hyphenation exceptions out of 8191
  83i,12n,88p,658b,551s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -992,10 +992,10 @@ type1/public/tex-gyre/qtmri.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1
 ic/txfonts/t1xtt.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/txf
 onts/t1xtt.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/txfonts/t
 cxtt.pfb>
-Output written on dran.pdf (29 pages, 3631357 bytes).
+Output written on dran.pdf (29 pages, 3631567 bytes).
 PDF statistics:
- 337 PDF objects out of 1000 (max. 8388607)
- 263 compressed objects within 3 object streams
- 51 named destinations out of 1000 (max. 500000)
- 249 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 346 PDF objects out of 1000 (max. 8388607)
+ 272 compressed objects within 3 object streams
+ 53 named destinations out of 1000 (max. 500000)
+ 265 words of extra memory for PDF output out of 10000 (max. 10000000)
 

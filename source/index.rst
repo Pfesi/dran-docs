@@ -89,7 +89,7 @@ on the program limitations and assumptions made before beginning any analysis.
 
    extras/commands.rst
 
-   changelog.rst
+   extras/changelog.rst
 
 ..   docs/modules.rst
 

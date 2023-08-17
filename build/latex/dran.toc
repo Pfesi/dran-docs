@@ -20,3 +20,5 @@
 \contentsline {section}{\numberline {3.11}Tutorials}{23}{section.3.11}%
 \contentsline {subsection}{\numberline {3.11.1}Data reduction of 2 GHz data.}{23}{subsection.3.11.1}%
 \contentsline {section}{\numberline {3.12}Commands}{25}{section.3.12}%
+\contentsline {section}{\numberline {3.13}Changelog}{25}{section.3.13}%
+\contentsline {subsection}{\numberline {3.13.1}0.0.1 (2023\sphinxhyphen {}08\sphinxhyphen {}16)}{25}{subsection.3.13.1}%
